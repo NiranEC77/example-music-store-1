@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
       - name: music-store-1
-        image: music-store-1:latest # Change to your image repo if pushing to a registry
+        image: ghcr.io/niranec77/music-store-1:latest # Change to your image repo if pushing to a registry
         ports:
         - containerPort: 5000
         env:
