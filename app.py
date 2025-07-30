@@ -1,19 +1,20 @@
-from flask import Flask, render_template_string, request, redirect, url_for, send_from_directory
+from flask import Flask, render_template_string, request, redirect, url_for, send_from_directory, session, jsonify
 import sqlite3
 import os
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+app.secret_key = 'your-secret-key-here'  # Required for sessions
+
+# Configuration
+CART_SERVICE_URL = os.environ.get('CART_SERVICE_URL', 'http://localhost:5002')
+ORDER_SERVICE_URL = os.environ.get('ORDER_SERVICE_URL', 'http://localhost:5001')
 DB_PATH = os.environ.get('DB_PATH', 'music_store.db')
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'covers')
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
 
-# --- Database Setup ---
 def init_db():
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
@@ -26,15 +27,19 @@ def init_db():
         )''')
         c.execute('''CREATE TABLE IF NOT EXISTS orders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            album_id INTEGER,
-            quantity INTEGER,
+            album_id INTEGER NOT NULL,
+            quantity INTEGER NOT NULL,
             FOREIGN KEY(album_id) REFERENCES albums(id)
         )''')
         conn.commit()
 
 init_db()
 
-# --- Templates ---
+# Ensure upload folder exists
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Main HTML Template
 INDEX_HTML = '''
 <!DOCTYPE html>
 <html lang="en">
@@ -110,6 +115,26 @@ INDEX_HTML = '''
 
         .tab:hover {
             background: #e9ecef;
+        }
+
+        .cart-tab {
+            text-decoration: none;
+            color: #666;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            padding: 20px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .cart-tab:hover {
+            background: #e9ecef;
+            color: #667eea;
         }
 
         .tab-content {
@@ -199,7 +224,7 @@ INDEX_HTML = '''
             padding: 8px 12px;
             border: 2px solid #e9ecef;
             border-radius: 6px;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
         .btn {
@@ -218,12 +243,30 @@ INDEX_HTML = '''
             transform: translateY(-2px);
         }
 
-        .btn-secondary {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
-        .btn-danger {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
         }
 
         .form-grid {
@@ -236,10 +279,6 @@ INDEX_HTML = '''
             margin-bottom: 20px;
         }
 
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-
         .form-group label {
             display: block;
             margin-bottom: 8px;
@@ -247,7 +286,7 @@ INDEX_HTML = '''
             color: #555;
         }
 
-        .form-group input, .form-group textarea {
+        .form-group input {
             width: 100%;
             padding: 12px;
             border: 2px solid #e9ecef;
@@ -256,13 +295,15 @@ INDEX_HTML = '''
             transition: border-color 0.2s;
         }
 
-        .form-group input:focus, .form-group textarea:focus {
+        .form-group input:focus {
             outline: none;
             border-color: #667eea;
         }
 
         .orders-list {
             list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
         }
 
         .order-item {
@@ -273,14 +314,10 @@ INDEX_HTML = '''
             border-left: 4px solid #667eea;
         }
 
-        .order-item strong {
-            color: #667eea;
-        }
-
         .empty-state {
             text-align: center;
+            padding: 40px 20px;
             color: #666;
-            padding: 60px 20px;
         }
 
         .empty-state p {
@@ -288,35 +325,9 @@ INDEX_HTML = '''
             margin-bottom: 10px;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
         @media (max-width: 768px) {
-            .tabs {
-                flex-direction: column;
+            .form-grid {
+                grid-template-columns: 1fr;
             }
             
             .header h1 {
@@ -324,10 +335,6 @@ INDEX_HTML = '''
             }
             
             .album-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .form-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -343,6 +350,7 @@ INDEX_HTML = '''
         <div class="tabs">
             <button class="tab active" onclick="showTab('shop')">🛍️ Shop</button>
             <button class="tab" onclick="showTab('admin')">⚙️ Admin</button>
+            <a href="/cart" class="tab cart-tab">🛒 Cart</a>
         </div>
 
         <div class="tab-content">
@@ -362,7 +370,7 @@ INDEX_HTML = '''
                             <h3>{{a[1]}}</h3>
                             <p>by {{a[2]}}</p>
                             <div class="album-price">${{a[3]}}</div>
-                            <form action="/order" method="post" class="order-form">
+                            <form action="/add_to_cart" method="post" class="order-form">
                                 <input type="hidden" name="album_id" value="{{a[0]}}">
                                 <input type="number" name="quantity" value="1" min="1" placeholder="Qty">
                                 <button type="submit" class="btn">Add to Cart</button>
@@ -510,15 +518,37 @@ def add_album():
         conn.commit()
     return redirect(url_for('index'))
 
-@app.route('/order', methods=['POST'])
-def order():
-    album_id = int(request.form['album_id'])
-    quantity = int(request.form['quantity'])
+@app.route('/api/album/<int:album_id>')
+def get_album(album_id):
+    """API endpoint to get album details"""
     with sqlite3.connect(DB_PATH) as conn:
         c = conn.cursor()
-        c.execute('INSERT INTO orders (album_id, quantity) VALUES (?, ?)', (album_id, quantity))
-        conn.commit()
-    return redirect(url_for('index'))
+        album = c.execute('SELECT * FROM albums WHERE id = ?', (album_id,)).fetchone()
+    
+    if not album:
+        return jsonify({'error': 'Album not found'}), 404
+    
+    return jsonify({
+        'id': album[0],
+        'name': album[1],
+        'artist': album[2],
+        'price': album[3],
+        'cover_url': album[4]
+    }), 200
+
+@app.route('/add_to_cart', methods=['POST'])
+def add_to_cart():
+    """Redirect to cart service"""
+    album_id = request.form['album_id']
+    quantity = request.form['quantity']
+    
+    # Redirect to cart service with parameters
+    return redirect(f"{CART_SERVICE_URL}/add_to_cart?album_id={album_id}&quantity={quantity}")
+
+@app.route('/cart')
+def view_cart():
+    """Redirect to cart service"""
+    return redirect(CART_SERVICE_URL)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000) 

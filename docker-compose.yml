@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  store-service:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - CART_SERVICE_URL=http://cart-service:5002
+      - ORDER_SERVICE_URL=http://order-service:5001
+    volumes:
+      - ./static:/app/static
+    depends_on:
+      - cart-service
+      - order-service
+
+  cart-service:
+    build: ./cart-service
+    ports:
+      - "5002:5002"
+    environment:
+      - STORE_SERVICE_URL=http://store-service:5000
+      - ORDER_SERVICE_URL=http://order-service:5001
+    volumes:
+      - cart-data:/app
+    depends_on:
+      - store-service
+      - order-service
+
+  order-service:
+    build: ./order-service
+    ports:
+      - "5001:5001"
+    environment:
+      - STORE_SERVICE_URL=http://store-service:5000
+    volumes:
+      - order-data:/app
+
+volumes:
+  cart-data:
+  order-data: 

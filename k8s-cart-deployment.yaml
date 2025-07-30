@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cart-service
+spec:
+  selector:
+    app: cart-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5002
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cart-service
+  template:
+    metadata:
+      labels:
+        app: cart-service
+    spec:
+      containers:
+      - name: cart-service
+        image: ghcr.io/niranec77/example-music-store-1-cart:latest
+        ports:
+        - containerPort: 5002
+        env:
+        - name: STORE_SERVICE_URL
+          value: "http://store-service:5000"
+        - name: ORDER_SERVICE_URL
+          value: "http://order-service:5001" 

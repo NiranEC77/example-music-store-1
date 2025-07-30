@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build and Push Microservices
 
 on:
   workflow_dispatch:
@@ -33,23 +33,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.CR_PAT || secrets.GITHUB_TOKEN }}
 
-      - name: Check authentication
-        run: |
-          echo "Testing authentication to GHCR..."
-          echo "Username: ${{ github.actor }}"
-          echo "Repository: ${{ github.repository }}"
-          echo "Event name: ${{ github.event_name }}"
-          echo "Workflow: ${{ github.workflow }}"
-          echo "Run ID: ${{ github.run_id }}"
-
-      - name: Debug repository info
-        run: |
-          echo "Repository: ${{ github.repository }}"
-          echo "Repository owner: ${{ github.repository_owner }}"
-          echo "Repository name: ${{ github.event.repository.name }}"
-          echo "Event repository: ${{ github.event.repository.full_name }}"
-
-      - name: Generate version and set image name
+      - name: Generate version and set image names
         run: |
           OWNER_NAME=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           REPO_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')
@@ -83,37 +67,82 @@ jobs:
             
             # Update VERSION file
             echo "$VERSION" > VERSION
-            
-            # Update Kubernetes deployment file with new version
-            sed -i "s|image: ghcr.io/niranec77/example-music-store-1:.*|image: ghcr.io/niranec77/example-music-store-1:$VERSION|" k8s-deployment.yaml
-            
-            # Commit and push the version update
-            git config --local user.email "action@github.com"
-            git config --local user.name "GitHub Action"
-            git add VERSION k8s-deployment.yaml
-            git commit -m "Auto-increment version to $VERSION and update k8s deployment" || echo "No changes to commit"
-            git push origin main || echo "Push failed or no changes"
           fi
           
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "Final image name: ghcr.io/$OWNER_NAME/$REPO_NAME:$VERSION"
+          echo "Building microservices with version: $VERSION"
 
-      - name: Build and push
+      - name: Build and push Store Service
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}:${{ env.VERSION }}
-            ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}:latest
+            ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-store:${{ env.VERSION }}
+            ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-store:latest
+
+      - name: Build and push Cart Service
+        uses: docker/build-push-action@v5
+        with:
+          context: ./cart-service
+          push: true
+          tags: |
+            ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-cart:${{ env.VERSION }}
+            ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-cart:latest
+
+      - name: Build and push Order Service
+        uses: docker/build-push-action@v5
+        with:
+          context: ./order-service
+          push: true
+          tags: |
+            ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-order:${{ env.VERSION }}
+            ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-order:latest
+
+      - name: Update Kubernetes deployment files
+        run: |
+          # Update the main k8s deployment for store service
+          sed -i "s|image: ghcr.io/niranec77/example-music-store-1:.*|image: ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-store:${{ env.VERSION }}|" k8s-deployment.yaml
+          
+          # Update cart service deployment
+          sed -i "s|image: ghcr.io/niranec77/.*-cart:.*|image: ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-cart:${{ env.VERSION }}|" k8s-cart-deployment.yaml
+          
+          # Update order service deployment
+          sed -i "s|image: ghcr.io/niranec77/.*-order:.*|image: ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-order:${{ env.VERSION }}|" k8s-order-deployment.yaml
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add VERSION k8s-deployment.yaml k8s-cart-deployment.yaml k8s-order-deployment.yaml
+          git commit -m "Auto-increment version to ${{ env.VERSION }} and update all k8s deployments" || echo "No changes to commit"
+          git push origin main || echo "Push failed or no changes"
 
       - name: Success message
         run: |
-          echo "Successfully built and pushed:"
-          echo "  - ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}:${{ env.VERSION }}"
-          echo "  - ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}:latest"
+          echo "🎉 Successfully built and pushed all microservices:"
           echo ""
-          echo "Updated k8s-deployment.yaml to use version: ${{ env.VERSION }}"
+          echo "📦 Store Service:"
+          echo "  - ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-store:${{ env.VERSION }}"
+          echo "  - ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-store:latest"
           echo ""
-          echo "To deploy the new version, run:"
-          echo "kubectl apply -f k8s-deployment.yaml" 
+          echo "🛒 Cart Service:"
+          echo "  - ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-cart:${{ env.VERSION }}"
+          echo "  - ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-cart:latest"
+          echo ""
+          echo "📋 Order Service:"
+          echo "  - ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-order:${{ env.VERSION }}"
+          echo "  - ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-order:latest"
+          echo ""
+          echo "📝 Updated Kubernetes deployment files:"
+          echo "  - k8s-deployment.yaml (Store Service)"
+          echo "  - k8s-cart-deployment.yaml (Cart Service)"
+          echo "  - k8s-order-deployment.yaml (Order Service)"
+          echo ""
+          echo "🚀 To deploy all services to Kubernetes, run:"
+          echo "kubectl apply -f k8s-deployment.yaml"
+          echo "kubectl apply -f k8s-cart-deployment.yaml"
+          echo "kubectl apply -f k8s-order-deployment.yaml"
+          echo ""
+          echo "🐳 To run locally with Docker Compose:"
+          echo "docker-compose up --build" 
