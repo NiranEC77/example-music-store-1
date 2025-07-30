@@ -30,7 +30,15 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          logout: true
+
+      - name: Check authentication
+        run: |
+          echo "Testing authentication to GHCR..."
+          echo "Username: ${{ github.actor }}"
+          echo "Repository: ${{ github.repository }}"
+          echo "Event name: ${{ github.event_name }}"
+          echo "Workflow: ${{ github.workflow }}"
+          echo "Run ID: ${{ github.run_id }}"
 
       - name: Debug repository info
         run: |
