@@ -1,6 +1,23 @@
 version: '3.8'
 
 services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: music_store
+      POSTGRES_USER: music_user
+      POSTGRES_PASSWORD: music_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database-service/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U music_user -d music_store"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   store-service:
     build: .
     ports:
@@ -8,11 +25,20 @@ services:
     environment:
       - CART_SERVICE_URL=http://cart-service:5002
       - ORDER_SERVICE_URL=http://order-service:5001
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=music_store
+      - DB_USER=music_user
+      - DB_PASSWORD=music_password
     volumes:
       - ./static:/app/static
     depends_on:
-      - cart-service
-      - order-service
+      postgres:
+        condition: service_healthy
+      cart-service:
+        condition: service_started
+      order-service:
+        condition: service_started
 
   cart-service:
     build: ./cart-service
@@ -37,5 +63,6 @@ services:
       - order-data:/app
 
 volumes:
+  postgres_data:
   cart-data:
   order-data: 

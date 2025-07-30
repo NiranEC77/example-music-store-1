@@ -11,9 +11,10 @@ The application is split into three independent microservices:
 - **Features**:
   - Browse albums
   - Add new albums (admin)
+  - Delete albums (admin)
   - View store statistics
   - Album catalog management
-- **Database**: SQLite (`music_store.db`)
+- **Database**: PostgreSQL (external database service)
 
 ### 2. **Cart Service** (Port 5002)
 - **Purpose**: Shopping cart management and checkout
@@ -34,6 +35,15 @@ The application is split into three independent microservices:
   - Order history
 - **Database**: SQLite (`orders.db`)
 
+### 4. **Database Service** (Port 5432)
+- **Purpose**: Centralized data storage
+- **Features**:
+  - PostgreSQL database
+  - Album and order data storage
+  - Automatic schema initialization
+  - Data persistence
+- **Database**: PostgreSQL (`music_store`)
+
 ## 🚀 Quick Start
 
 ### Using Docker Compose (Recommended)
@@ -52,6 +62,7 @@ The application is split into three independent microservices:
    - **Store**: http://localhost:5000
    - **Cart**: http://localhost:5002
    - **Orders Dashboard**: http://localhost:5001
+   - **Database**: localhost:5432 (PostgreSQL)
 
 ### Manual Setup
 
@@ -116,8 +127,10 @@ Store Service ←→ Cart Service ←→ Order Service
 - ✅ Modern, responsive UI with tabbed interface
 - ✅ Album catalog with cover images
 - ✅ Admin panel for adding albums
+- ✅ Delete album functionality
 - ✅ Store statistics dashboard
 - ✅ File upload for album covers
+- ✅ PostgreSQL database integration
 
 ### Cart Service
 - ✅ Shopping cart with persistent storage
@@ -137,7 +150,7 @@ Store Service ←→ Cart Service ←→ Order Service
 ## 🛠️ Technology Stack
 
 - **Backend**: Python Flask
-- **Database**: SQLite (separate for each service)
+- **Database**: PostgreSQL (centralized) + SQLite (cart/orders)
 - **Frontend**: HTML, CSS, JavaScript
 - **Containerization**: Docker & Docker Compose
 - **Communication**: HTTP REST APIs
@@ -160,6 +173,9 @@ exmaple-music-store-1/
 │   ├── app.py
 │   ├── requirements.txt
 │   └── Dockerfile
+├── database-service/     # Database service
+│   ├── docker-compose.yml
+│   └── init.sql
 └── static/              # Static assets
     └── covers/          # Album cover images
 ```
@@ -171,7 +187,11 @@ exmaple-music-store-1/
 #### Store Service
 - `CART_SERVICE_URL`: URL of cart service (default: http://localhost:5002)
 - `ORDER_SERVICE_URL`: URL of order service (default: http://localhost:5001)
-- `DB_PATH`: Database file path (default: music_store.db)
+- `DB_HOST`: Database host (default: localhost)
+- `DB_PORT`: Database port (default: 5432)
+- `DB_NAME`: Database name (default: music_store)
+- `DB_USER`: Database user (default: music_user)
+- `DB_PASSWORD`: Database password (default: music_password)
 
 #### Cart Service
 - `STORE_SERVICE_URL`: URL of store service (default: http://localhost:5000)
@@ -191,7 +211,10 @@ docker-compose up -d
 
 ### Kubernetes
 ```bash
+kubectl apply -f k8s-database-deployment.yaml
 kubectl apply -f k8s-deployment.yaml
+kubectl apply -f k8s-cart-deployment.yaml
+kubectl apply -f k8s-order-deployment.yaml
 ```
 
 ### Individual Services
@@ -248,7 +271,8 @@ docker-compose logs order-service
 - This is a demo application with simulated payments
 - No real payment processing is implemented
 - Session management uses simple Flask sessions
-- Databases are SQLite files (not suitable for production)
+- Main database is PostgreSQL (production-ready)
+- Cart and order services use SQLite (for simplicity)
 - No authentication/authorization implemented
 
 ## 🚧 Future Enhancements

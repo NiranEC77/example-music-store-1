@@ -1,5 +1,6 @@
 from flask import Flask, render_template_string, request, redirect, url_for, send_from_directory, session, jsonify
-import sqlite3
+import psycopg2
+import psycopg2.extras
 import os
 from werkzeug.utils import secure_filename
 
@@ -9,31 +10,27 @@ app.secret_key = 'your-secret-key-here'  # Required for sessions
 # Configuration
 CART_SERVICE_URL = os.environ.get('CART_SERVICE_URL', 'http://localhost:5002')
 ORDER_SERVICE_URL = os.environ.get('ORDER_SERVICE_URL', 'http://localhost:5001')
-DB_PATH = os.environ.get('DB_PATH', 'music_store.db')
+
+# Database configuration
+DB_HOST = os.environ.get('DB_HOST', 'localhost')
+DB_PORT = os.environ.get('DB_PORT', '5432')
+DB_NAME = os.environ.get('DB_NAME', 'music_store')
+DB_USER = os.environ.get('DB_USER', 'music_user')
+DB_PASSWORD = os.environ.get('DB_PASSWORD', 'music_password')
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'covers')
+
+def get_db_connection():
+    """Get database connection"""
+    return psycopg2.connect(
+        host=DB_HOST,
+        port=DB_PORT,
+        database=DB_NAME,
+        user=DB_USER,
+        password=DB_PASSWORD
+    )
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif'}
-
-def init_db():
-    with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        c.execute('''CREATE TABLE IF NOT EXISTS albums (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            artist TEXT NOT NULL,
-            price REAL NOT NULL,
-            cover_url TEXT
-        )''')
-        c.execute('''CREATE TABLE IF NOT EXISTS orders (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            album_id INTEGER NOT NULL,
-            quantity INTEGER NOT NULL,
-            FOREIGN KEY(album_id) REFERENCES albums(id)
-        )''')
-        conn.commit()
-
-init_db()
 
 # Ensure upload folder exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -213,6 +210,13 @@ INDEX_HTML = '''
             margin-bottom: 15px;
         }
 
+        .album-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
         .order-form {
             display: flex;
             gap: 10px;
@@ -225,6 +229,18 @@ INDEX_HTML = '''
             border: 2px solid #e9ecef;
             border-radius: 6px;
             font-size: 0.9rem;
+        }
+
+        .delete-form {
+            display: inline;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
         }
 
         .btn {
@@ -359,25 +375,30 @@ INDEX_HTML = '''
                 <h2 class="section-title">📀 Available Albums</h2>
                 {% if albums %}
                 <div class="album-grid">
-                    {% for a in albums %}
-                    <div class="album-card">
-                        {% if a[4] %}
-                        <img src="{{a[4]}}" alt="Album cover" class="album-cover">
-                        {% else %}
-                        <div class="album-cover">No Cover</div>
-                        {% endif %}
-                        <div class="album-info">
-                            <h3>{{a[1]}}</h3>
-                            <p>by {{a[2]}}</p>
-                            <div class="album-price">${{a[3]}}</div>
-                            <form action="/add_to_cart" method="post" class="order-form">
-                                <input type="hidden" name="album_id" value="{{a[0]}}">
-                                <input type="number" name="quantity" value="1" min="1" placeholder="Qty">
-                                <button type="submit" class="btn">Add to Cart</button>
-                            </form>
+                                            {% for a in albums %}
+                        <div class="album-card">
+                            {% if a.cover_url %}
+                            <img src="{{a.cover_url}}" alt="Album cover" class="album-cover">
+                            {% else %}
+                            <div class="album-cover">No Cover</div>
+                            {% endif %}
+                            <div class="album-info">
+                                <h3>{{a.name}}</h3>
+                                <p>by {{a.artist}}</p>
+                                <div class="album-price">${{"%.2f"|format(a.price)}}</div>
+                                <div class="album-actions">
+                                    <form action="/add_to_cart" method="post" class="order-form">
+                                        <input type="hidden" name="album_id" value="{{a.id}}">
+                                        <input type="number" name="quantity" value="1" min="1" placeholder="Qty">
+                                        <button type="submit" class="btn">Add to Cart</button>
+                                    </form>
+                                    <form action="/delete/{{a.id}}" method="post" class="delete-form" onsubmit="return confirm('Are you sure you want to delete this album?')">
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    {% endfor %}
+                        {% endfor %}
                 </div>
                 {% else %}
                 <div class="empty-state">
@@ -401,7 +422,7 @@ INDEX_HTML = '''
                         <div class="stat-label">Total Orders</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number">${{"%.2f"|format(orders|sum(attribute=4) * orders|sum(attribute=3)) if orders else 0}}</div>
+                        <div class="stat-number">${{"%.2f"|format(orders|sum(attribute='price') * orders|sum(attribute='quantity')) if orders else 0}}</div>
                         <div class="stat-label">Total Revenue</div>
                     </div>
                 </div>
@@ -438,11 +459,11 @@ INDEX_HTML = '''
                         <h3 style="color: #667eea; margin-bottom: 20px;">🛒 Recent Orders</h3>
                         {% if orders %}
                         <ul class="orders-list">
-                            {% for o in orders %}
-                            <li class="order-item">
-                                {{o[3]}}x <strong>{{o[1]}}</strong> by {{o[2]}} <span style="color: #667eea;">(${{o[4]}} each)</span>
-                            </li>
-                            {% endfor %}
+                                                    {% for o in orders %}
+                        <li class="order-item">
+                            {{o.quantity}}x <strong>{{o.name}}</strong> by {{o.artist}} <span style="color: #667eea;">(${{"%.2f"|format(o.price)}} each)</span>
+                        </li>
+                        {% endfor %}
                         </ul>
                         {% else %}
                         <div class="empty-state">
@@ -484,10 +505,14 @@ INDEX_HTML = '''
 # --- Routes ---
 @app.route('/')
 def index():
-    with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        albums = c.execute('SELECT * FROM albums').fetchall()
-        orders = c.execute('''SELECT orders.id, albums.name, albums.artist, orders.quantity, albums.price FROM orders JOIN albums ON orders.album_id = albums.id''').fetchall()
+    with get_db_connection() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute('SELECT * FROM albums ORDER BY created_at DESC')
+            albums = cur.fetchall()
+            cur.execute('''SELECT orders.id, albums.name, albums.artist, orders.quantity, albums.price 
+                          FROM orders JOIN albums ON orders.album_id = albums.id 
+                          ORDER BY orders.created_at DESC''')
+            orders = cur.fetchall()
     return render_template_string(INDEX_HTML, albums=albums, orders=orders)
 
 @app.route('/add', methods=['POST'])
@@ -512,28 +537,38 @@ def add_album():
         cover_path = url_for('static', filename=f'covers/{filename}')
     elif cover_url:
         cover_path = cover_url
-    with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        c.execute('INSERT INTO albums (name, artist, price, cover_url) VALUES (?, ?, ?, ?)', (name, artist, price, cover_path))
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute('INSERT INTO albums (name, artist, price, cover_url) VALUES (%s, %s, %s, %s)', 
+                       (name, artist, price, cover_path))
+        conn.commit()
+    return redirect(url_for('index'))
+
+@app.route('/delete/<int:album_id>', methods=['POST'])
+def delete_album(album_id):
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute('DELETE FROM albums WHERE id = %s', (album_id,))
         conn.commit()
     return redirect(url_for('index'))
 
 @app.route('/api/album/<int:album_id>')
 def get_album(album_id):
     """API endpoint to get album details"""
-    with sqlite3.connect(DB_PATH) as conn:
-        c = conn.cursor()
-        album = c.execute('SELECT * FROM albums WHERE id = ?', (album_id,)).fetchone()
+    with get_db_connection() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute('SELECT * FROM albums WHERE id = %s', (album_id,))
+            album = cur.fetchone()
     
     if not album:
         return jsonify({'error': 'Album not found'}), 404
     
     return jsonify({
-        'id': album[0],
-        'name': album[1],
-        'artist': album[2],
-        'price': album[3],
-        'cover_url': album[4]
+        'id': album['id'],
+        'name': album['name'],
+        'artist': album['artist'],
+        'price': float(album['price']),
+        'cover_url': album['cover_url']
     }), 200
 
 @app.route('/add_to_cart', methods=['POST'])
