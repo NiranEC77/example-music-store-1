@@ -60,6 +60,7 @@ spec:
       - name: init-script
         configMap:
           name: postgres-init-script
+      storageClassName: vsan-default-storage-policy
 ---
 apiVersion: v1
 kind: ConfigMap
