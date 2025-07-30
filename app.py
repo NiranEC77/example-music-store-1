@@ -64,7 +64,7 @@ INDEX_HTML = '''
 
         .header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             color: white;
         }
 
@@ -80,32 +80,66 @@ INDEX_HTML = '''
             opacity: 0.9;
         }
 
-        .content-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: 15px 15px 0 0;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        .card {
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
             background: white;
-            border-radius: 15px;
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+        }
+
+        .tab-content {
+            background: white;
+            border-radius: 0 0 15px 15px;
             padding: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             backdrop-filter: blur(10px);
+            min-height: 600px;
         }
 
-        .card h2 {
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .section-title {
             color: #667eea;
-            margin-bottom: 20px;
-            font-size: 1.8rem;
+            margin-bottom: 25px;
+            font-size: 2rem;
             font-weight: 600;
         }
 
         .album-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
         }
 
         .album-card {
@@ -184,8 +218,26 @@ INDEX_HTML = '''
             transform: translateY(-2px);
         }
 
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
         .form-group {
             margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
         }
 
         .form-group label {
@@ -195,7 +247,7 @@ INDEX_HTML = '''
             color: #555;
         }
 
-        .form-group input {
+        .form-group input, .form-group textarea {
             width: 100%;
             padding: 12px;
             border: 2px solid #e9ecef;
@@ -204,7 +256,7 @@ INDEX_HTML = '''
             transition: border-color 0.2s;
         }
 
-        .form-group input:focus {
+        .form-group input:focus, .form-group textarea:focus {
             outline: none;
             border-color: #667eea;
         }
@@ -228,7 +280,7 @@ INDEX_HTML = '''
         .empty-state {
             text-align: center;
             color: #666;
-            padding: 40px 20px;
+            padding: 60px 20px;
         }
 
         .empty-state p {
@@ -236,9 +288,35 @@ INDEX_HTML = '''
             margin-bottom: 10px;
         }
 
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
         @media (max-width: 768px) {
-            .content-grid {
-                grid-template-columns: 1fr;
+            .tabs {
+                flex-direction: column;
             }
             
             .header h1 {
@@ -246,6 +324,10 @@ INDEX_HTML = '''
             }
             
             .album-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -258,9 +340,15 @@ INDEX_HTML = '''
             <p>Discover and collect your favorite albums</p>
         </div>
 
-        <div class="content-grid">
-            <div class="card">
-                <h2>📀 Available Albums</h2>
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('shop')">🛍️ Shop</button>
+            <button class="tab" onclick="showTab('admin')">⚙️ Admin</button>
+        </div>
+
+        <div class="tab-content">
+            <!-- Shop Tab -->
+            <div id="shop" class="content-section active">
+                <h2 class="section-title">📀 Available Albums</h2>
                 {% if albums %}
                 <div class="album-grid">
                     {% for a in albums %}
@@ -286,57 +374,101 @@ INDEX_HTML = '''
                 {% else %}
                 <div class="empty-state">
                     <p>No albums available yet.</p>
-                    <p>Add your first album below!</p>
+                    <p>Switch to Admin tab to add some albums!</p>
                 </div>
                 {% endif %}
             </div>
 
-            <div class="card">
-                <h2>➕ Add New Album</h2>
-                <form action="/add" method="post" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="name">Album Name</label>
-                        <input type="text" id="name" name="name" required>
+            <!-- Admin Tab -->
+            <div id="admin" class="content-section">
+                <h2 class="section-title">⚙️ Store Management</h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">{{albums|length}}</div>
+                        <div class="stat-label">Total Albums</div>
                     </div>
-                    <div class="form-group">
-                        <label for="artist">Artist</label>
-                        <input type="text" id="artist" name="artist" required>
+                    <div class="stat-card">
+                        <div class="stat-number">{{orders|length}}</div>
+                        <div class="stat-label">Total Orders</div>
                     </div>
-                    <div class="form-group">
-                        <label for="price">Price ($)</label>
-                        <input type="number" id="price" name="price" step="0.01" min="0" required>
+                    <div class="stat-card">
+                        <div class="stat-number">${{"%.2f"|format(orders|sum(attribute=4) * orders|sum(attribute=3)) if orders else 0}}</div>
+                        <div class="stat-label">Total Revenue</div>
                     </div>
-                    <div class="form-group">
-                        <label for="cover_file">Cover Image (File)</label>
-                        <input type="file" id="cover_file" name="cover_file" accept="image/*">
-                    </div>
-                    <div class="form-group">
-                        <label for="cover_url">Cover Image (URL)</label>
-                        <input type="url" id="cover_url" name="cover_url" placeholder="https://example.com/image.jpg">
-                    </div>
-                    <button type="submit" class="btn" style="width: 100%; padding: 15px;">Add Album</button>
-                </form>
-            </div>
-        </div>
+                </div>
 
-        <div class="card">
-            <h2>🛒 Recent Orders</h2>
-            {% if orders %}
-            <ul class="orders-list">
-                {% for o in orders %}
-                <li class="order-item">
-                    {{o[3]}}x <strong>{{o[1]}}</strong> by {{o[2]}} <span style="color: #667eea;">(${{o[4]}} each)</span>
-                </li>
-                {% endfor %}
-            </ul>
-            {% else %}
-            <div class="empty-state">
-                <p>No orders yet.</p>
-                <p>Start shopping to see your orders here!</p>
+                <div class="form-grid">
+                    <div>
+                        <h3 style="color: #667eea; margin-bottom: 20px;">➕ Add New Album</h3>
+                        <form action="/add" method="post" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="name">Album Name</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="artist">Artist</label>
+                                <input type="text" id="artist" name="artist" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="price">Price ($)</label>
+                                <input type="number" id="price" name="price" step="0.01" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cover_file">Cover Image (File)</label>
+                                <input type="file" id="cover_file" name="cover_file" accept="image/*">
+                            </div>
+                            <div class="form-group">
+                                <label for="cover_url">Cover Image (URL)</label>
+                                <input type="url" id="cover_url" name="cover_url" placeholder="https://example.com/image.jpg">
+                            </div>
+                            <button type="submit" class="btn" style="width: 100%; padding: 15px;">Add Album</button>
+                        </form>
+                    </div>
+
+                    <div>
+                        <h3 style="color: #667eea; margin-bottom: 20px;">🛒 Recent Orders</h3>
+                        {% if orders %}
+                        <ul class="orders-list">
+                            {% for o in orders %}
+                            <li class="order-item">
+                                {{o[3]}}x <strong>{{o[1]}}</strong> by {{o[2]}} <span style="color: #667eea;">(${{o[4]}} each)</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <div class="empty-state">
+                            <p>No orders yet.</p>
+                            <p>Start shopping to see orders here!</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-            {% endif %}
         </div>
     </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all content sections
+            const contentSections = document.querySelectorAll('.content-section');
+            contentSections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected content section
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+    </script>
 </body>
 </html>
 '''
