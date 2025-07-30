@@ -38,11 +38,12 @@ CREATE TRIGGER update_albums_updated_at
     FOR EACH ROW 
     EXECUTE FUNCTION update_updated_at_column();
 
--- Insert some sample data
-INSERT INTO albums (name, artist, price, cover_url) VALUES
-    ('Dark Side of the Moon', 'Pink Floyd', 19.99, 'https://upload.wikimedia.org/wikipedia/en/3/3b/Dark_Side_of_the_Moon.png'),
-    ('Abbey Road', 'The Beatles', 24.99, 'https://upload.wikimedia.org/wikipedia/en/4/42/Beatles_-_Abbey_Road.jpg'),
-    ('Thriller', 'Michael Jackson', 21.99, 'https://upload.wikimedia.org/wikipedia/en/5/55/Michael_Jackson_-_Thriller.png'),
-    ('Back in Black', 'AC/DC', 18.99, 'https://upload.wikimedia.org/wikipedia/en/b/be/ACDC_Back_in_Black.png'),
-    ('The Wall', 'Pink Floyd', 22.99, 'https://upload.wikimedia.org/wikipedia/en/0/0f/PinkFloydWallCoverOriginalNoText.jpg')
-ON CONFLICT DO NOTHING; 
+    -- Insert some sample data
+    INSERT INTO albums (name, artist, price, cover_url) VALUES
+        ('Vulgar Display of Power', 'Pantera', 24.99, 'https://upload.wikimedia.org/wikipedia/en/8/87/Pantera_-_Vulgar_Display_of_Power.jpg'),
+        ('...And Justice for All', 'Metallica', 22.99, 'https://upload.wikimedia.org/wikipedia/en/b/bd/Metallica_-_...And_Justice_for_All_cover.jpg'),
+        ('Superunknown', 'Soundgarden', 21.99, 'https://upload.wikimedia.org/wikipedia/en/3/3c/Soundgarden_-_Superunknown.jpg'),
+        ('Colony', 'In Flames', 19.99, 'https://upload.wikimedia.org/wikipedia/en/8/8a/In_Flames_-_Colony.jpg'),
+        ('System of a Down', 'System of a Down', 20.99, 'https://upload.wikimedia.org/wikipedia/en/6/64/System_of_a_down.jpg'),
+        ('Somewhere in Time', 'Iron Maiden', 23.99, 'https://upload.wikimedia.org/wikipedia/en/9/9c/Iron_Maiden_-_Somewhere_in_Time.jpg')
+    ON CONFLICT DO NOTHING; 
