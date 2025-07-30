@@ -45,9 +45,11 @@ spec:
         env:
         - name: STORE_SERVICE_URL
           value: "http://store-service:5000"
+        - name: ORDER_DB_PATH
+          value: "/app/data/orders.db"
         volumeMounts:
         - name: order-data
-          mountPath: /app
+          mountPath: /app/data
       volumes:
       - name: order-data
         persistentVolumeClaim:

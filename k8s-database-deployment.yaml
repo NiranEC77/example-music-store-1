@@ -39,7 +39,7 @@ spec:
     spec:
       containers:
       - name: postgres
-        image: ghcr.io/niranec77/example-music-store-1-database:1.0.2
+        image: postgres:15-alpine
         ports:
         - containerPort: 5432
         env:
@@ -49,6 +49,8 @@ spec:
           value: "music_user"
         - name: POSTGRES_PASSWORD
           value: "music_password"
+        - name: PGDATA
+          value: "/var/lib/postgresql/data/pgdata"
         volumeMounts:
         - name: postgres-storage
           mountPath: /var/lib/postgresql/data

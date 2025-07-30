@@ -47,9 +47,11 @@ spec:
           value: "http://store-service:5000"
         - name: ORDER_SERVICE_URL
           value: "http://order-service:5001"
+        - name: CART_DB_PATH
+          value: "/app/data/cart.db"
         volumeMounts:
         - name: cart-data
-          mountPath: /app
+          mountPath: /app/data
       volumes:
       - name: cart-data
         persistentVolumeClaim:
