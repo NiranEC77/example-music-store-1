@@ -39,7 +39,7 @@ spec:
     spec:
       containers:
       - name: cart-service
-        image: ghcr.io/niranec77/example-music-store-1-cart:1.0.2
+        image: ghcr.io/niranec77/example-music-store-1-cart:1.0.3
         ports:
         - containerPort: 5002
         env:
