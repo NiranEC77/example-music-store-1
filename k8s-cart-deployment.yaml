@@ -1,4 +1,16 @@
 apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cart-pvc
+spec:
+  storageClassName: vsan-default-storage-policy
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: cart-service
@@ -34,4 +46,11 @@ spec:
         - name: STORE_SERVICE_URL
           value: "http://store-service:5000"
         - name: ORDER_SERVICE_URL
-          value: "http://order-service:5001" 
+          value: "http://order-service:5001"
+        volumeMounts:
+        - name: cart-data
+          mountPath: /app
+      volumes:
+      - name: cart-data
+        persistentVolumeClaim:
+          claimName: cart-pvc 

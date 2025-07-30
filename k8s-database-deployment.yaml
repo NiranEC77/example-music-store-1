@@ -3,6 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
 spec:
+  storageClassName: vsan-default-storage-policy
   accessModes:
     - ReadWriteOnce
   resources:
