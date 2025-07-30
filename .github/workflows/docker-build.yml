@@ -84,11 +84,14 @@ jobs:
             # Update VERSION file
             echo "$VERSION" > VERSION
             
+            # Update Kubernetes deployment file with new version
+            sed -i "s|image: ghcr.io/niranec77/example-music-store-1:.*|image: ghcr.io/niranec77/example-music-store-1:$VERSION|" k8s-deployment.yaml
+            
             # Commit and push the version update
             git config --local user.email "action@github.com"
             git config --local user.name "GitHub Action"
-            git add VERSION
-            git commit -m "Auto-increment version to $VERSION" || echo "No changes to commit"
+            git add VERSION k8s-deployment.yaml
+            git commit -m "Auto-increment version to $VERSION and update k8s deployment" || echo "No changes to commit"
             git push origin main || echo "Push failed or no changes"
           fi
           
@@ -108,4 +111,9 @@ jobs:
         run: |
           echo "Successfully built and pushed:"
           echo "  - ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}:${{ env.VERSION }}"
-          echo "  - ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}:latest" 
+          echo "  - ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}:latest"
+          echo ""
+          echo "Updated k8s-deployment.yaml to use version: ${{ env.VERSION }}"
+          echo ""
+          echo "To deploy the new version, run:"
+          echo "kubectl apply -f k8s-deployment.yaml" 
