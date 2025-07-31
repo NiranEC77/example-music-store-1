@@ -1064,15 +1064,24 @@ ADMIN_HTML = '''
         <div class="header">
             <div class="header-content">
                 <a href="/" class="back-button">← Back to Store</a>
-                <div class="admin-info">
-                    Logged in as: {{user.username}}
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="admin-info">
+                        Logged in as: <span id="adminUsername">Admin</span>
+                    </div>
+                    <button onclick="logout()" class="btn btn-danger" style="padding: 8px 16px; font-size: 0.9rem;">Logout</button>
                 </div>
             </div>
             <h1>⚙️ Store Administration</h1>
             <p>Manage your brutal metal collection</p>
         </div>
 
-        <h2 class="section-title">📊 Store Statistics</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <h2 class="section-title">📊 Store Statistics</h2>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span id="lastUpdated" style="color: #666; font-size: 0.9rem;">Last updated: <span id="updateTime"></span></span>
+                <button onclick="refreshStats()" class="btn" style="padding: 10px 20px; font-size: 0.9rem;">🔄 Refresh</button>
+            </div>
+        </div>
         
         <div class="stats-grid">
             <div class="stat-card">
@@ -1082,11 +1091,26 @@ ADMIN_HTML = '''
             <div class="stat-card">
                 <div class="stat-number">{{orders|length}}</div>
                 <div class="stat-label">Total Orders</div>
+                {% if orders|length == 0 %}
+                <div style="font-size: 0.8rem; color: #999; margin-top: 5px;">No orders yet</div>
+                {% endif %}
             </div>
             <div class="stat-card">
-                <div class="stat-number">${{"%.2f"|format(orders|sum(attribute='price') * orders|sum(attribute='quantity')) if orders else 0}}</div>
+                <div class="stat-number">${{"%.2f"|format(total_revenue)}}</div>
                 <div class="stat-label">Total Revenue</div>
+                {% if total_revenue == 0 %}
+                <div style="font-size: 0.8rem; color: #999; margin-top: 5px;">No revenue yet</div>
+                {% endif %}
             </div>
+        </div>
+        
+        <!-- Debug info (remove in production) -->
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 30px; font-size: 0.9rem; color: #666;">
+            <strong>Debug Info:</strong><br>
+            Order Service URL: {{ORDER_SERVICE_URL}}<br>
+            Orders found: {{orders|length}}<br>
+            Total Revenue: ${{"%.2f"|format(total_revenue)}}<br>
+            <a href="/test-order-service" target="_blank" style="color: #667eea;">Test Order Service</a>
         </div>
 
         <div class="form-grid">
@@ -1160,6 +1184,19 @@ ADMIN_HTML = '''
     </div>
 
     <script>
+        // Initialize admin user info
+        function initAdminInfo() {
+            const adminUser = localStorage.getItem('adminUser');
+            if (adminUser) {
+                try {
+                    const user = JSON.parse(adminUser);
+                    document.getElementById('adminUsername').textContent = user.username || 'Admin';
+                } catch (e) {
+                    console.error('Error parsing admin user:', e);
+                }
+            }
+        }
+
         // Check if user is still authenticated
         function checkAuth() {
             const token = localStorage.getItem('adminToken');
@@ -1185,17 +1222,61 @@ ADMIN_HTML = '''
             })
             .catch(error => {
                 console.error('Auth check failed:', error);
+                // Don't redirect immediately on network errors, just log
+                console.log('Network error during auth check, continuing...');
+            });
+        }
+
+        // Logout function
+        function logout() {
+            const token = localStorage.getItem('adminToken');
+            
+            // Call logout API
+            fetch('/admin/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token: token })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Clear local storage
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminUser');
+                // Redirect to home page
+                window.location.href = '/';
+            })
+            .catch(error => {
+                console.error('Logout error:', error);
+                // Clear local storage anyway and redirect
                 localStorage.removeItem('adminToken');
                 localStorage.removeItem('adminUser');
                 window.location.href = '/';
             });
         }
 
-        // Check auth every 5 minutes
-        setInterval(checkAuth, 300000);
+        // Check auth every 10 minutes (less frequent to avoid constant redirects)
+        setInterval(checkAuth, 600000);
         
-        // Check auth on page load
+        // Initialize on page load
+        initAdminInfo();
         checkAuth();
+        updateTimestamp();
+        
+        // Auto-refresh statistics every 30 seconds
+        setInterval(refreshStats, 30000);
+        
+        function refreshStats() {
+            // Refresh the page to get updated statistics
+            window.location.reload();
+        }
+        
+        function updateTimestamp() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById('updateTime').textContent = timeString;
+        }
     </script>
 </body>
 </html>
@@ -1487,18 +1568,90 @@ def verify_token():
 @app.route('/admin')
 def admin_panel():
     """Admin panel - authentication handled by JavaScript"""
-    # Get albums and orders for admin panel
+    import requests
+    
+    # Get albums from main store database
     with get_db_connection() as conn:
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute('SELECT * FROM albums ORDER BY created_at DESC')
             albums = cur.fetchall()
-            cur.execute('''SELECT orders.id, albums.name, albums.artist, orders.quantity, albums.price 
-                          FROM orders JOIN albums ON orders.album_id = albums.id 
-                          ORDER BY orders.created_at DESC''')
-            orders = cur.fetchall()
+    
+    # Get orders from order service
+    orders = []
+    total_revenue = 0
+    try:
+        print(f"Fetching orders from: {ORDER_SERVICE_URL}/api/orders")
+        response = requests.get(f"{ORDER_SERVICE_URL}/api/orders", timeout=5)
+        print(f"Order service response status: {response.status_code}")
+        
+        if response.status_code == 200:
+            orders_data = response.json()
+            print(f"Found {len(orders_data)} orders")
+            
+            # Convert to the format expected by the template
+            for order in orders_data:
+                print(f"Processing order {order['id']}")
+                # Get order details with items
+                order_detail_response = requests.get(f"{ORDER_SERVICE_URL}/api/orders/{order['id']}", timeout=5)
+                if order_detail_response.status_code == 200:
+                    order_detail = order_detail_response.json()
+                    print(f"Order {order['id']} has {len(order_detail.get('items', []))} items")
+                    for item in order_detail.get('items', []):
+                        orders.append({
+                            'id': order['id'],
+                            'name': item['album_name'],
+                            'artist': item['artist'],
+                            'quantity': item['quantity'],
+                            'price': item['price']
+                        })
+                        total_revenue += item['price'] * item['quantity']
+                else:
+                    print(f"Failed to get details for order {order['id']}: {order_detail_response.status_code}")
+        else:
+            print(f"Failed to fetch orders: {response.status_code}")
+            print(f"Response content: {response.text}")
+    except requests.RequestException as e:
+        print(f"Error fetching orders: {e}")
+        # Fallback to empty orders if order service is unavailable
+        orders = []
+        total_revenue = 0
+    except Exception as e:
+        print(f"Unexpected error fetching orders: {e}")
+        orders = []
+        total_revenue = 0
+    
+    print(f"Final stats - Orders: {len(orders)}, Revenue: ${total_revenue}")
     
     # Let JavaScript handle authentication
-    return render_template_string(ADMIN_HTML, albums=albums, orders=orders, user=None)
+    return render_template_string(ADMIN_HTML, albums=albums, orders=orders, total_revenue=total_revenue, ORDER_SERVICE_URL=ORDER_SERVICE_URL, user=None)
+
+@app.route('/admin/logout', methods=['POST'])
+def admin_logout():
+    """Handle admin logout"""
+    # Clear any admin session data
+    session.pop('admin_user', None)
+    session.pop('admin_token', None)
+    return jsonify({'success': True, 'message': 'Logged out successfully'})
+
+@app.route('/test-order-service')
+def test_order_service():
+    """Test endpoint to check order service connectivity"""
+    import requests
+    
+    try:
+        response = requests.get(f"{ORDER_SERVICE_URL}/api/orders", timeout=5)
+        return jsonify({
+            'status': 'success',
+            'order_service_url': ORDER_SERVICE_URL,
+            'response_status': response.status_code,
+            'response_data': response.json() if response.status_code == 200 else response.text
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'order_service_url': ORDER_SERVICE_URL,
+            'error': str(e)
+        })
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True) 
