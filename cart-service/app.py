@@ -360,11 +360,8 @@ def order_success():
         # Use the provided session_id and store it in our session
         session['session_id'] = session_id
     
-    order_details = session.get('order_details', {})
-    # Ensure order_details is a dictionary, not a function
-    if callable(order_details):
-        order_details = {}
-    return render_template_string(SUCCESS_HTML, order_details=order_details)
+    # We don't need order_details for the simplified success page
+    return render_template_string(SUCCESS_HTML)
 
 # Cart HTML Template
 CART_HTML = '''
@@ -1324,71 +1321,28 @@ SUCCESS_HTML = '''
             text-shadow: 0 0 5px rgba(139, 0, 0, 0.2);
         }
 
-        .order-details {
-            background: #f8f9fa;
+        .order-summary {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
             border-radius: 12px;
             padding: 25px;
             margin: 20px 0;
             border-left: 4px solid #28a745;
             text-align: left;
+            border: 2px solid #333;
         }
 
-        .order-details h4 {
+        .order-summary h4 {
             color: #28a745;
             margin-bottom: 15px;
             font-size: 1.3rem;
+            text-align: center;
         }
 
-        .detail-section {
-            margin-bottom: 20px;
-        }
-
-        .detail-section h5 {
-            color: #667eea;
-            margin-bottom: 8px;
-            font-size: 1.1rem;
-        }
-
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            padding: 5px 0;
-        }
-
-        .detail-label {
-            font-weight: 500;
-            color: #555;
-        }
-
-        .detail-value {
-            color: #333;
-        }
-
-        .order-items {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
-        }
-
-        .order-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .order-item:last-child {
-            border-bottom: none;
-        }
-
-        .total-row {
-            border-top: 2px solid #e9ecef;
-            padding-top: 10px;
-            margin-top: 10px;
-            font-weight: bold;
-            color: #667eea;
+        .order-info {
+            color: #ffffff;
+            font-size: 1rem;
+            line-height: 1.6;
+            text-align: center;
         }
 
         .btn {
@@ -1437,81 +1391,28 @@ SUCCESS_HTML = '''
             <div class="success-icon">🔥</div>
             <h1 class="success-title">TRANSACTION SUCCESSFUL!</h1>
             <p class="success-message">
-                🤘 WOOHOO! You purchased these cool albums! 
-                <br>Your brutal metal collection is on its way to your lair!
-                <br>You'll receive a confirmation email with tracking info.
+                🤘 WOOHOO! Your brutal metal albums have been purchased successfully! 
+                <br>Your collection is on its way to your lair!
+                <br>You'll receive a confirmation email with tracking information.
                 <br><strong>ROCK ON! 🤘</strong>
             </p>
             
-            {% if order_details and order_details.items %}
-            <div class="order-details">
-                <h4>📋 Order Summary</h4>
-                
-                <div class="detail-section">
-                    <h5>🎵 Items Ordered</h5>
-                    <div class="order-items">
-                        {% for item in order_details.items %}
-                        <div class="order-item">
-                            <span>{{item.quantity}}x {{item.album_name}} by {{item.artist}}</span>
-                            <span>${{"%.2f"|format(item.price * item.quantity)}}</span>
-                        </div>
-                        {% endfor %}
-                        <div class="order-item total-row">
-                            <span>Total:</span>
-                            <span>${{"%.2f"|format(order_details.total)}}</span>
-                        </div>
-                    </div>
+            <div class="order-summary">
+                <h4>📋 Order Confirmation</h4>
+                <div class="order-info">
+                    <p>✅ Your order has been processed successfully</p>
+                    <p>✅ Payment has been confirmed</p>
+                    <p>✅ Your albums will be shipped within 2-3 business days</p>
+                    <p>✅ You'll receive tracking information via email</p>
+                    <p style="margin-top: 20px; font-weight: bold; color: #8b0000;">
+                        Thank you for supporting brutal metal! 🤘
+                    </p>
                 </div>
-
-                {% if order_details.shipping_info %}
-                <div class="detail-section">
-                    <h5>🚚 Shipping Information</h5>
-                    <div class="detail-row">
-                        <span class="detail-label">Name:</span>
-                        <span class="detail-value">{{order_details.shipping_info.first_name}} {{order_details.shipping_info.last_name}}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Address:</span>
-                        <span class="detail-value">{{order_details.shipping_info.address}}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">City:</span>
-                        <span class="detail-value">{{order_details.shipping_info.city}}, {{order_details.shipping_info.state}} {{order_details.shipping_info.zip_code}}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Country:</span>
-                        <span class="detail-value">{{order_details.shipping_info.country}}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Phone:</span>
-                        <span class="detail-value">{{order_details.shipping_info.phone}}</span>
-                    </div>
-                </div>
-                {% endif %}
-
-                {% if order_details.payment_info %}
-                <div class="detail-section">
-                    <h5>💳 Payment Information</h5>
-                    <div class="detail-row">
-                        <span class="detail-label">Cardholder:</span>
-                        <span class="detail-value">{{order_details.payment_info.cardholder_name}}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Card:</span>
-                        <span class="detail-value">**** **** **** {{order_details.payment_info.card_last_four}}</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Email:</span>
-                        <span class="detail-value">{{order_details.payment_info.email}}</span>
-                    </div>
-                </div>
-                {% endif %}
             </div>
-            {% endif %}
 
             <div style="margin-top: 30px;">
                 <a href="/" class="btn">Continue Shopping</a>
-                <a href="/" class="btn btn-secondary">View Orders</a>
+                <a href="/" class="btn btn-secondary">Back to Store</a>
             </div>
         </div>
     </div>
