@@ -822,7 +822,8 @@ def add_to_cart():
                 # Update session_id if provided
                 if 'session_id' in result:
                     session['cart_session_id'] = result['session_id']
-                return redirect(f"{CART_SERVICE_URL}/cart")
+                # Redirect to cart page with session_id
+                return redirect(f"{CART_SERVICE_URL}/?session_id={session['cart_session_id']}")
             else:
                 return jsonify(result), 400
         else:
