@@ -550,6 +550,43 @@ INDEX_HTML = '''
             margin-bottom: 10px;
         }
 
+        .cart-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #2d2d2d 0%, #404040 50%, #2d2d2d 100%);
+            border: 2px solid #8b0000;
+            border-radius: 10px;
+            padding: 20px;
+            color: #ffffff;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            max-width: 300px;
+        }
+
+        .cart-notification.show {
+            transform: translateX(0);
+        }
+
+        .cart-notification h3 {
+            color: #8b0000;
+            margin-bottom: 10px;
+            text-shadow: 0 0 5px rgba(139, 0, 0, 0.3);
+        }
+
+        .cart-notification p {
+            margin-bottom: 15px;
+            color: #cccccc;
+        }
+
+        .cart-notification .btn {
+            margin: 5px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
         @media (max-width: 768px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -597,7 +634,7 @@ INDEX_HTML = '''
                                 <p>by {{a.artist}}</p>
                                 <div class="album-price">${{"%.2f"|format(a.price)}}</div>
                                 <div class="album-actions">
-                                    <form action="/add_to_cart" method="post" class="order-form">
+                                    <form action="/add_to_cart" method="post" class="order-form" onsubmit="return addToCart(event, this)">
                                         <input type="hidden" name="album_id" value="{{a.id}}">
                                         <input type="number" name="quantity" value="1" min="1" placeholder="Qty">
                                         <button type="submit" class="btn">Add to Cart</button>
@@ -727,6 +764,66 @@ INDEX_HTML = '''
             // Add active class to clicked tab
             event.target.classList.add('active');
         }
+
+        function addToCart(event, form) {
+            event.preventDefault();
+            
+            const formData = new FormData(form);
+            
+            fetch('/add_to_cart', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showCartNotification(data.redirect_url);
+                } else {
+                    alert('Error adding to cart: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error adding to cart');
+            });
+            
+            return false;
+        }
+
+        function showCartNotification(redirectUrl) {
+            // Remove existing notification
+            const existing = document.querySelector('.cart-notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            // Create notification
+            const notification = document.createElement('div');
+            notification.className = 'cart-notification';
+            notification.innerHTML = `
+                <h3>🤘 Item Added!</h3>
+                <p>Your brutal metal album has been added to the cart!</p>
+                <button class="btn" onclick="window.location.href='${redirectUrl}'">🛒 Go to Cart</button>
+                <button class="btn btn-secondary" onclick="this.parentElement.remove()">Continue Shopping</button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            // Auto-hide after 10 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.remove();
+                    }
+                }, 300);
+            }, 10000);
+        }
     </script>
 </body>
 </html>
@@ -842,8 +939,12 @@ def add_to_cart():
                 # Update session_id if provided
                 if 'session_id' in result:
                     session['cart_session_id'] = result['session_id']
-                # Redirect to cart page with session_id
-                return redirect(f"{CART_SERVICE_URL}/?session_id={session['cart_session_id']}")
+                # Return success with redirect info for JavaScript handling
+                return jsonify({
+                    'success': True,
+                    'message': 'Item added to cart!',
+                    'redirect_url': f"{CART_SERVICE_URL}/?session_id={session['cart_session_id']}"
+                })
             else:
                 return jsonify(result), 400
         else:

@@ -211,8 +211,15 @@ def checkout():
 
 @app.route('/process_payment', methods=['POST'])
 def process_payment():
-    if 'session_id' not in session:
-        return redirect(url_for('cart'))
+    # Get session_id from request or session
+    session_id = request.form.get('session_id')
+    if not session_id:
+        if 'session_id' not in session:
+            return redirect(url_for('cart'))
+        session_id = session['session_id']
+    else:
+        # Use the provided session_id and store it in our session
+        session['session_id'] = session_id
     
     # Get cart items
     with sqlite3.connect(CART_DB_PATH) as conn:
@@ -220,7 +227,7 @@ def process_payment():
         cart_items = c.execute('''
             SELECT * FROM cart_items 
             WHERE session_id = ?
-        ''', (session['session_id'],)).fetchall()
+        ''', (session_id,)).fetchall()
     
     if not cart_items:
         return redirect(url_for('cart'))
@@ -285,7 +292,7 @@ def process_payment():
     
     # Prepare order data with shipping and billing information
     order_data = {
-        'session_id': session['session_id'],
+        'session_id': session_id,
         'items': [
             {
                 'album_id': item[2],
@@ -329,7 +336,7 @@ def process_payment():
             # Clear cart after successful order
             with sqlite3.connect(CART_DB_PATH) as conn:
                 c = conn.cursor()
-                c.execute('DELETE FROM cart_items WHERE session_id = ?', (session['session_id'],))
+                c.execute('DELETE FROM cart_items WHERE session_id = ?', (session_id,))
                 conn.commit()
             
             # Store order details in session for success page
@@ -1413,16 +1420,16 @@ SUCCESS_HTML = '''
 <body>
     <div class="container">
         <div class="header">
-            <h1>🤘 ROCK ON! Order Confirmed!</h1>
+            <h1>🤘 WOOHOO! PURCHASE COMPLETE!</h1>
             <p>You've got your brutal metal albums!</p>
         </div>
 
         <div class="success-card">
             <div class="success-icon">🔥</div>
-            <h1 class="success-title">PAYMENT SUCCESSFUL!</h1>
+            <h1 class="success-title">TRANSACTION SUCCESSFUL!</h1>
             <p class="success-message">
-                🤘 Your brutal metal collection is on its way! 
-                <br>Your order has been processed and will be shipped to your lair soon.
+                🤘 WOOHOO! You purchased these cool albums! 
+                <br>Your brutal metal collection is on its way to your lair!
                 <br>You'll receive a confirmation email with tracking info.
                 <br><strong>ROCK ON! 🤘</strong>
             </p>

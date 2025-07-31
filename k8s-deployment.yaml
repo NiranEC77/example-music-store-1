@@ -24,7 +24,9 @@ spec:
       labels:
         app: music-store-1
       annotations:
-        kubernetes.io/change-cause: "Fixed session_id KeyError, moved delete to admin, fixed payment redirect"
+        kubernetes.io/change-cause: "Added cart dropdown notification, fixed cart clearing, updated success message"
+        date: "2024-01-$(date +%d)"
+        timestamp: "$(date +%s)"
     spec:
       containers:
       - name: music-store-1

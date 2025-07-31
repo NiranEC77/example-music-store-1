@@ -39,7 +39,9 @@ spec:
       labels:
         app: cart-service
       annotations:
-        kubernetes.io/change-cause: "Fixed session_id KeyError in remove_item and update_quantity routes"
+        kubernetes.io/change-cause: "Fixed cart clearing after purchase, updated success message"
+        date: "2024-01-$(date +%d)"
+        timestamp: "$(date +%s)"
     spec:
       containers:
       - name: cart-service
