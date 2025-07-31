@@ -41,7 +41,7 @@ spec:
     spec:
       containers:
       - name: postgres
-        image: ghcr.io/niranec77/example-music-store-1-database:1.0.4
+        image: ghcr.io/niranec77/example-music-store-1-database:1.0.5
         ports:
         - containerPort: 5432
         env:
