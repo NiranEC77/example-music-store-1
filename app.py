@@ -5,7 +5,7 @@ import os
 import requests
 from werkzeug.utils import secure_filename
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.secret_key = 'your-secret-key-here'  # Required for sessions
 
 # Configuration
@@ -47,6 +47,29 @@ def test_static():
     <img src="/static/covers/Metallica_-_...And_Justice_for_All_cover.jpg" alt="Metallica" style="width: 200px;">
     <img src="/static/covers/Sound_garden-Superunknown.jpg" alt="Soundgarden" style="width: 200px;">
     '''
+
+@app.route('/debug-db')
+def debug_db():
+    """Debug database content"""
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute('SELECT * FROM albums')
+                albums = cur.fetchall()
+        
+        html = '<h1>Database Debug</h1><h2>Albums in Database:</h2>'
+        for album in albums:
+            html += f'''
+            <div style="border: 1px solid #ccc; margin: 10px; padding: 10px;">
+                <h3>{album['name']} - {album['artist']}</h3>
+                <p>Price: ${album['price']}</p>
+                <p>Cover URL: {album['cover_url']}</p>
+                <img src="{album['cover_url']}" alt="{album['name']}" style="width: 200px; border: 1px solid red;">
+            </div>
+            '''
+        return html
+    except Exception as e:
+        return f'<h1>Database Error</h1><p>Error: {str(e)}</p>'
 
 # Main HTML Template
 INDEX_HTML = '''
