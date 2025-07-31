@@ -794,7 +794,7 @@ CHECKOUT_HTML = '''
             </div>
             {% endif %}
 
-            <form action="/process_payment" method="post" id="checkout-form">
+            <form action="process_payment" method="post" id="checkout-form">
                 <!-- Contact Information -->
                 <div class="form-section">
                     <h3>📧 Contact Information</h3>

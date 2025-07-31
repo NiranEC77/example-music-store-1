@@ -23,8 +23,7 @@ spec:
       protocol: TCP
       port: 5002
       targetPort: 5002
-      nodePort: 30008
-  type: LoadBalancer
+  type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
