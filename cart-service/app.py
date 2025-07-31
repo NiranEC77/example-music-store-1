@@ -178,34 +178,65 @@ def process_payment():
     if not cart_items:
         return redirect(url_for('cart'))
     
+    # Validate all form fields
+    required_fields = [
+        'card_number', 'expiry', 'cvv', 'cardholder_name',
+        'shipping_first_name', 'shipping_last_name', 'shipping_address', 
+        'shipping_city', 'shipping_state', 'shipping_zip', 'shipping_country',
+        'billing_first_name', 'billing_last_name', 'billing_address',
+        'billing_city', 'billing_state', 'billing_zip', 'billing_country',
+        'email', 'phone'
+    ]
+    
+    for field in required_fields:
+        if not request.form.get(field, '').strip():
+            total = sum(item[6] * item[5] for item in cart_items)
+            return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, 
+                                        error=f"Please fill in all required fields. Missing: {field.replace('_', ' ').title()}")
+    
     # Validate payment details
     card_number = request.form.get('card_number', '').replace(' ', '')
     expiry = request.form.get('expiry', '')
     cvv = request.form.get('cvv', '')
+    cardholder_name = request.form.get('cardholder_name', '').strip()
     
-    if not card_number or not expiry or not cvv:
-        total = sum(item[6] * item[5] for item in cart_items)
-        return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, error="Please fill in all fields")
-    
+    # Enhanced validation
     if len(card_number) < 13 or len(card_number) > 19:
         total = sum(item[6] * item[5] for item in cart_items)
-        return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, error="Invalid card number")
+        return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, 
+                                    error="Invalid card number. Please enter a valid credit card number.")
     
     if len(cvv) < 3 or len(cvv) > 4:
         total = sum(item[6] * item[5] for item in cart_items)
-        return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, error="Invalid CVV")
+        return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, 
+                                    error="Invalid CVV. Please enter a valid 3 or 4 digit CVV.")
+    
+    if len(cardholder_name) < 2:
+        total = sum(item[6] * item[5] for item in cart_items)
+        return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, 
+                                    error="Please enter the cardholder name as it appears on the card.")
+    
+    # Validate email format
+    import re
+    email = request.form.get('email', '').strip()
+    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    if not re.match(email_pattern, email):
+        total = sum(item[6] * item[5] for item in cart_items)
+        return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, 
+                                    error="Please enter a valid email address.")
     
     # Simulate processing delay
     import time
-    time.sleep(1)
+    time.sleep(2)
     
-    # Simulate random payment failures (5% chance)
+    # Simulate random payment failures (3% chance)
     import random
-    if random.random() < 0.05:
+    if random.random() < 0.03:
         total = sum(item[6] * item[5] for item in cart_items)
-        return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, error="Payment declined. Please try again.")
+        return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, 
+                                    error="Payment declined. Please check your card details and try again.")
     
-    # Send order to order service
+    # Prepare order data with shipping and billing information
     order_data = {
         'session_id': session['session_id'],
         'items': [
@@ -218,7 +249,31 @@ def process_payment():
             }
             for item in cart_items
         ],
-        'total': sum(item[6] * item[5] for item in cart_items)
+        'total': sum(item[6] * item[5] for item in cart_items),
+        'shipping_info': {
+            'first_name': request.form.get('shipping_first_name', '').strip(),
+            'last_name': request.form.get('shipping_last_name', '').strip(),
+            'address': request.form.get('shipping_address', '').strip(),
+            'city': request.form.get('shipping_city', '').strip(),
+            'state': request.form.get('shipping_state', '').strip(),
+            'zip_code': request.form.get('shipping_zip', '').strip(),
+            'country': request.form.get('shipping_country', '').strip(),
+            'phone': request.form.get('phone', '').strip()
+        },
+        'billing_info': {
+            'first_name': request.form.get('billing_first_name', '').strip(),
+            'last_name': request.form.get('billing_last_name', '').strip(),
+            'address': request.form.get('billing_address', '').strip(),
+            'city': request.form.get('billing_city', '').strip(),
+            'state': request.form.get('billing_state', '').strip(),
+            'zip_code': request.form.get('billing_zip', '').strip(),
+            'country': request.form.get('billing_country', '').strip()
+        },
+        'payment_info': {
+            'cardholder_name': cardholder_name,
+            'card_last_four': card_number[-4:],
+            'email': email
+        }
     }
     
     try:
@@ -230,17 +285,23 @@ def process_payment():
                 c.execute('DELETE FROM cart_items WHERE session_id = ?', (session['session_id'],))
                 conn.commit()
             
+            # Store order details in session for success page
+            session['order_details'] = order_data
+            
             return redirect(url_for('order_success'))
         else:
             total = sum(item[6] * item[5] for item in cart_items)
-            return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, error="Order processing failed")
+            return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, 
+                                        error="Order processing failed. Please try again.")
     except requests.RequestException:
         total = sum(item[6] * item[5] for item in cart_items)
-        return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, error="Order service unavailable")
+        return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, 
+                                    error="Order service unavailable. Please try again later.")
 
 @app.route('/order_success')
 def order_success():
-    return render_template_string(SUCCESS_HTML)
+    order_details = session.get('order_details', {})
+    return render_template_string(SUCCESS_HTML, order_details=order_details)
 
 # Cart HTML Template
 CART_HTML = '''
@@ -475,7 +536,7 @@ CART_HTML = '''
 </html>
 '''
 
-# Checkout and Success templates (same as before but adapted for cart items)
+# Enhanced Checkout HTML Template with complete checkout experience
 CHECKOUT_HTML = '''
 <!DOCTYPE html>
 <html lang="en">
@@ -498,7 +559,7 @@ CHECKOUT_HTML = '''
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -562,18 +623,30 @@ CHECKOUT_HTML = '''
             justify-content: space-between;
         }
 
-        .payment-form {
-            margin-top: 30px;
+        .form-section {
+            margin-bottom: 40px;
         }
 
-        .payment-form h3 {
+        .form-section h3 {
             color: #667eea;
             margin-bottom: 20px;
             font-size: 1.3rem;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
 
         .form-group {
             margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
         }
 
         .form-group label {
@@ -583,7 +656,7 @@ CHECKOUT_HTML = '''
             color: #555;
         }
 
-        .form-group input {
+        .form-group input, .form-group select {
             width: 100%;
             padding: 12px;
             border: 2px solid #e9ecef;
@@ -592,7 +665,7 @@ CHECKOUT_HTML = '''
             transition: border-color 0.2s;
         }
 
-        .form-group input:focus {
+        .form-group input:focus, .form-group select:focus {
             outline: none;
             border-color: #667eea;
         }
@@ -601,6 +674,17 @@ CHECKOUT_HTML = '''
             display: grid;
             grid-template-columns: 2fr 1fr 1fr;
             gap: 15px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
         }
 
         .btn {
@@ -618,6 +702,12 @@ CHECKOUT_HTML = '''
 
         .btn:hover {
             transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .error-message {
@@ -644,8 +734,29 @@ CHECKOUT_HTML = '''
             text-decoration: underline;
         }
 
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         @media (max-width: 768px) {
-            .card-row {
+            .form-row, .card-row {
                 grid-template-columns: 1fr;
             }
             
@@ -658,8 +769,8 @@ CHECKOUT_HTML = '''
 <body>
     <div class="container">
         <div class="header">
-            <h1>💳 Checkout</h1>
-            <p>Complete your purchase</p>
+            <h1>💳 Complete Checkout</h1>
+            <p>Enter your shipping and payment information</p>
         </div>
 
         <div class="checkout-card">
@@ -683,29 +794,160 @@ CHECKOUT_HTML = '''
             </div>
             {% endif %}
 
-            <form action="/process_payment" method="post" class="payment-form">
-                <h3>💳 Payment Information</h3>
-                
-                <div class="form-group">
-                    <label for="card_number">Card Number</label>
-                    <input type="text" id="card_number" name="card_number" placeholder="1234 5678 9012 3456" maxlength="19" required>
+            <form action="/process_payment" method="post" id="checkout-form">
+                <!-- Contact Information -->
+                <div class="form-section">
+                    <h3>📧 Contact Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number *</label>
+                            <input type="tel" id="phone" name="phone" placeholder="(555) 123-4567" required>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="card-row">
+                <!-- Shipping Address -->
+                <div class="form-section">
+                    <h3>🚚 Shipping Address</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="shipping_first_name">First Name *</label>
+                            <input type="text" id="shipping_first_name" name="shipping_first_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="shipping_last_name">Last Name *</label>
+                            <input type="text" id="shipping_last_name" name="shipping_last_name" required>
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="shipping_address">Address *</label>
+                        <input type="text" id="shipping_address" name="shipping_address" placeholder="123 Main St" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="shipping_city">City *</label>
+                            <input type="text" id="shipping_city" name="shipping_city" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="shipping_state">State/Province *</label>
+                            <input type="text" id="shipping_state" name="shipping_state" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="shipping_zip">ZIP/Postal Code *</label>
+                            <input type="text" id="shipping_zip" name="shipping_zip" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="shipping_country">Country *</label>
+                            <select id="shipping_country" name="shipping_country" required>
+                                <option value="">Select Country</option>
+                                <option value="US">United States</option>
+                                <option value="CA">Canada</option>
+                                <option value="UK">United Kingdom</option>
+                                <option value="AU">Australia</option>
+                                <option value="DE">Germany</option>
+                                <option value="FR">France</option>
+                                <option value="JP">Japan</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Billing Address -->
+                <div class="form-section">
+                    <h3>💳 Billing Address</h3>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="same_as_shipping" name="same_as_shipping">
+                        <label for="same_as_shipping">Same as shipping address</label>
+                    </div>
+                    <div id="billing-fields">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="billing_first_name">First Name *</label>
+                                <input type="text" id="billing_first_name" name="billing_first_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="billing_last_name">Last Name *</label>
+                                <input type="text" id="billing_last_name" name="billing_last_name" required>
+                            </div>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="billing_address">Address *</label>
+                            <input type="text" id="billing_address" name="billing_address" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="billing_city">City *</label>
+                                <input type="text" id="billing_city" name="billing_city" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="billing_state">State/Province *</label>
+                                <input type="text" id="billing_state" name="billing_state" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="billing_zip">ZIP/Postal Code *</label>
+                                <input type="text" id="billing_zip" name="billing_zip" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="billing_country">Country *</label>
+                                <select id="billing_country" name="billing_country" required>
+                                    <option value="">Select Country</option>
+                                    <option value="US">United States</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="UK">United Kingdom</option>
+                                    <option value="AU">Australia</option>
+                                    <option value="DE">Germany</option>
+                                    <option value="FR">France</option>
+                                    <option value="JP">Japan</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Information -->
+                <div class="form-section">
+                    <h3>💳 Payment Information</h3>
                     <div class="form-group">
-                        <label for="expiry">Expiry Date</label>
-                        <input type="text" id="expiry" name="expiry" placeholder="MM/YY" maxlength="5" required>
+                        <label for="cardholder_name">Cardholder Name *</label>
+                        <input type="text" id="cardholder_name" name="cardholder_name" placeholder="As it appears on card" required>
                     </div>
                     <div class="form-group">
-                        <label for="cvv">CVV</label>
-                        <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="4" required>
+                        <label for="card_number">Card Number *</label>
+                        <input type="text" id="card_number" name="card_number" placeholder="1234 5678 9012 3456" maxlength="19" required>
                     </div>
-                    <div class="form-group">
-                        <label>&nbsp;</label>
-                        <button type="submit" class="btn">Pay ${{"%.2f"|format(total)}}</button>
+                    <div class="card-row">
+                        <div class="form-group">
+                            <label for="expiry">Expiry Date *</label>
+                            <input type="text" id="expiry" name="expiry" placeholder="MM/YY" maxlength="5" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cvv">CVV *</label>
+                            <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="4" required>
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button type="submit" class="btn" id="submit-btn">
+                                <span id="btn-text">Pay ${{"%.2f"|format(total)}}</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Processing your payment...</p>
+            </div>
         </div>
 
         <div class="back-link">
@@ -734,6 +976,75 @@ CHECKOUT_HTML = '''
         document.getElementById('cvv').addEventListener('input', function(e) {
             e.target.value = e.target.value.replace(/[^0-9]/g, '');
         });
+
+        // Same as shipping address functionality
+        document.getElementById('same_as_shipping').addEventListener('change', function(e) {
+            const billingFields = document.getElementById('billing-fields');
+            if (e.target.checked) {
+                billingFields.style.display = 'none';
+                // Copy shipping values to billing
+                document.getElementById('billing_first_name').value = document.getElementById('shipping_first_name').value;
+                document.getElementById('billing_last_name').value = document.getElementById('shipping_last_name').value;
+                document.getElementById('billing_address').value = document.getElementById('shipping_address').value;
+                document.getElementById('billing_city').value = document.getElementById('shipping_city').value;
+                document.getElementById('billing_state').value = document.getElementById('shipping_state').value;
+                document.getElementById('billing_zip').value = document.getElementById('shipping_zip').value;
+                document.getElementById('billing_country').value = document.getElementById('shipping_country').value;
+            } else {
+                billingFields.style.display = 'block';
+            }
+        });
+
+        // Form submission with loading state
+        document.getElementById('checkout-form').addEventListener('submit', function(e) {
+            const submitBtn = document.getElementById('submit-btn');
+            const btnText = document.getElementById('btn-text');
+            const loading = document.getElementById('loading');
+            
+            submitBtn.disabled = true;
+            btnText.textContent = 'Processing...';
+            loading.style.display = 'block';
+        });
+
+        // Auto-fill with sample data for testing
+        function fillSampleData() {
+            const sampleData = {
+                'email': 'test@example.com',
+                'phone': '(555) 123-4567',
+                'shipping_first_name': 'John',
+                'shipping_last_name': 'Doe',
+                'shipping_address': '123 Main Street',
+                'shipping_city': 'New York',
+                'shipping_state': 'NY',
+                'shipping_zip': '10001',
+                'shipping_country': 'US',
+                'billing_first_name': 'John',
+                'billing_last_name': 'Doe',
+                'billing_address': '123 Main Street',
+                'billing_city': 'New York',
+                'billing_state': 'NY',
+                'billing_zip': '10001',
+                'billing_country': 'US',
+                'cardholder_name': 'John Doe',
+                'card_number': '4111 1111 1111 1111',
+                'expiry': '12/25',
+                'cvv': '123'
+            };
+            
+            for (const [key, value] of Object.entries(sampleData)) {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.value = value;
+                }
+            }
+        }
+
+        // Add sample data button for testing (remove in production)
+        const sampleBtn = document.createElement('button');
+        sampleBtn.textContent = 'Fill Sample Data (Testing)';
+        sampleBtn.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #28a745; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; z-index: 1000;';
+        sampleBtn.onclick = fillSampleData;
+        document.body.appendChild(sampleBtn);
     </script>
 </body>
 </html>
@@ -758,20 +1069,34 @@ SUCCESS_HTML = '''
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
         .success-card {
             background: white;
             border-radius: 15px;
-            padding: 50px;
+            padding: 40px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             backdrop-filter: blur(10px);
             text-align: center;
-            max-width: 500px;
-            width: 90%;
         }
 
         .success-icon {
@@ -793,6 +1118,73 @@ SUCCESS_HTML = '''
             line-height: 1.6;
         }
 
+        .order-details {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+            text-align: left;
+        }
+
+        .order-details h4 {
+            color: #28a745;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+        }
+
+        .detail-section h5 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            padding: 5px 0;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .detail-value {
+            color: #333;
+        }
+
+        .order-items {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .total-row {
+            border-top: 2px solid #e9ecef;
+            padding-top: 10px;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
         .btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -805,41 +1197,104 @@ SUCCESS_HTML = '''
             transition: transform 0.2s;
             text-decoration: none;
             display: inline-block;
+            margin: 10px;
         }
 
         .btn:hover {
             transform: translateY(-2px);
         }
 
-        .order-details {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 20px 0;
-            border-left: 4px solid #28a745;
+        .btn-secondary {
+            background: #6c757d;
         }
 
-        .order-details h4 {
-            color: #28a745;
-            margin-bottom: 10px;
+        .btn-secondary:hover {
+            background: #5a6268;
         }
     </style>
 </head>
 <body>
-    <div class="success-card">
-        <div class="success-icon">✅</div>
-        <h1 class="success-title">Payment Successful!</h1>
-        <p class="success-message">
-            Thank you for your purchase! Your order has been processed successfully.
-            You will receive a confirmation email shortly.
-        </p>
-        
-        <div class="order-details">
-            <h4>Order Details</h4>
-            <p>Your order has been added to our system and will be processed soon.</p>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 Order Confirmed!</h1>
+            <p>Thank you for your purchase</p>
         </div>
 
-        <a href="/" class="btn">Continue Shopping</a>
+        <div class="success-card">
+            <div class="success-icon">✅</div>
+            <h1 class="success-title">Payment Successful!</h1>
+            <p class="success-message">
+                Your order has been processed successfully and will be shipped soon.
+                You will receive a confirmation email with tracking information.
+            </p>
+            
+            {% if order_details %}
+            <div class="order-details">
+                <h4>📋 Order Summary</h4>
+                
+                <div class="detail-section">
+                    <h5>🎵 Items Ordered</h5>
+                    <div class="order-items">
+                        {% for item in order_details.items %}
+                        <div class="order-item">
+                            <span>{{item.quantity}}x {{item.album_name}} by {{item.artist}}</span>
+                            <span>${{"%.2f"|format(item.price * item.quantity)}}</span>
+                        </div>
+                        {% endfor %}
+                        <div class="order-item total-row">
+                            <span>Total:</span>
+                            <span>${{"%.2f"|format(order_details.total)}}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h5>🚚 Shipping Information</h5>
+                    <div class="detail-row">
+                        <span class="detail-label">Name:</span>
+                        <span class="detail-value">{{order_details.shipping_info.first_name}} {{order_details.shipping_info.last_name}}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Address:</span>
+                        <span class="detail-value">{{order_details.shipping_info.address}}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">City:</span>
+                        <span class="detail-value">{{order_details.shipping_info.city}}, {{order_details.shipping_info.state}} {{order_details.shipping_info.zip_code}}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Country:</span>
+                        <span class="detail-value">{{order_details.shipping_info.country}}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Phone:</span>
+                        <span class="detail-value">{{order_details.shipping_info.phone}}</span>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h5>💳 Payment Information</h5>
+                    <div class="detail-row">
+                        <span class="detail-label">Cardholder:</span>
+                        <span class="detail-value">{{order_details.payment_info.cardholder_name}}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Card:</span>
+                        <span class="detail-value">**** **** **** {{order_details.payment_info.card_last_four}}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Email:</span>
+                        <span class="detail-value">{{order_details.payment_info.email}}</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div style="margin-top: 30px;">
+                <a href="/" class="btn">Continue Shopping</a>
+                <a href="/" class="btn btn-secondary">View Orders</a>
+            </div>
+        </div>
     </div>
 </body>
 </html>
