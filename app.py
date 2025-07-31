@@ -605,7 +605,7 @@ INDEX_HTML = '''
 <body>
     <div class="container">
         <div class="header">
-                            <h1>🤘 Metal Music Store</h1>
+                            <h1><a href="/" style="text-decoration: none; color: inherit;">🤘 Metal Music Store</a></h1>
                             <p>Discover and collect the most brutal metal albums</p>
         </div>
 
@@ -803,7 +803,7 @@ INDEX_HTML = '''
             notification.innerHTML = `
                 <h3>🤘 Item Added!</h3>
                 <p>Your brutal metal album has been added to the cart!</p>
-                <button class="btn" onclick="window.location.href='${redirectUrl}'">🛒 Go to Cart</button>
+                <button class="btn" onclick="window.location.href='/cart'">🛒 Checkout</button>
                 <button class="btn btn-secondary" onclick="this.parentElement.remove()">Continue Shopping</button>
             `;
             
@@ -1057,7 +1057,13 @@ def order_success():
     import requests
     
     try:
-        response = requests.get(f"{CART_SERVICE_URL}/order_success")
+        # Get session_id from our session
+        session_id = session.get('cart_session_id')
+        if not session_id:
+            return redirect(url_for('index'))
+        
+        # Pass session_id as query parameter
+        response = requests.get(f"{CART_SERVICE_URL}/order_success?session_id={session_id}")
         return response.content, response.status_code
     except requests.RequestException as e:
         return f"Error connecting to cart service: {str(e)}", 503

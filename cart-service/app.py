@@ -52,7 +52,7 @@ def cart():
     
     total = sum(item[6] * item[5] for item in cart_items)  # quantity * price
     
-    return render_template_string(CART_HTML, cart_items=cart_items, total=total)
+    return render_template_string(CART_HTML, cart_items=cart_items, total=total, STORE_SERVICE_URL=STORE_SERVICE_URL)
 
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
@@ -207,7 +207,7 @@ def checkout():
     
     total = sum(item[6] * item[5] for item in cart_items)
     
-    return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total)
+    return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, STORE_SERVICE_URL=STORE_SERVICE_URL)
 
 @app.route('/process_payment', methods=['POST'])
 def process_payment():
@@ -246,7 +246,7 @@ def process_payment():
         if not request.form.get(field, '').strip():
             total = sum(item[6] * item[5] for item in cart_items)
             return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, 
-                                        error=f"Please fill in all required fields. Missing: {field.replace('_', ' ').title()}")
+                                        error=f"Please fill in all required fields. Missing: {field.replace('_', ' ').title()}", STORE_SERVICE_URL=STORE_SERVICE_URL)
     
     # Validate payment details
     card_number = request.form.get('card_number', '').replace(' ', '')
@@ -258,17 +258,17 @@ def process_payment():
     if len(card_number) < 13 or len(card_number) > 19:
         total = sum(item[6] * item[5] for item in cart_items)
         return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, 
-                                    error="Invalid card number. Please enter a valid credit card number.")
+                                    error="Invalid card number. Please enter a valid credit card number.", STORE_SERVICE_URL=STORE_SERVICE_URL)
     
     if len(cvv) < 3 or len(cvv) > 4:
         total = sum(item[6] * item[5] for item in cart_items)
         return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, 
-                                    error="Invalid CVV. Please enter a valid 3 or 4 digit CVV.")
+                                    error="Invalid CVV. Please enter a valid 3 or 4 digit CVV.", STORE_SERVICE_URL=STORE_SERVICE_URL)
     
     if len(cardholder_name) < 2:
         total = sum(item[6] * item[5] for item in cart_items)
         return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, 
-                                    error="Please enter the cardholder name as it appears on the card.")
+                                    error="Please enter the cardholder name as it appears on the card.", STORE_SERVICE_URL=STORE_SERVICE_URL)
     
     # Validate email format
     import re
@@ -277,7 +277,7 @@ def process_payment():
     if not re.match(email_pattern, email):
         total = sum(item[6] * item[5] for item in cart_items)
         return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, 
-                                    error="Please enter a valid email address.")
+                                    error="Please enter a valid email address.", STORE_SERVICE_URL=STORE_SERVICE_URL)
     
     # Simulate processing delay
     import time
@@ -288,7 +288,7 @@ def process_payment():
     if random.random() < 0.03:
         total = sum(item[6] * item[5] for item in cart_items)
         return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, 
-                                    error="Payment declined. Please check your card details and try again.")
+                                    error="Payment declined. Please check your card details and try again.", STORE_SERVICE_URL=STORE_SERVICE_URL)
     
     # Prepare order data with shipping and billing information
     order_data = {
@@ -346,16 +346,25 @@ def process_payment():
         else:
             total = sum(item[6] * item[5] for item in cart_items)
             return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, 
-                                        error="Order processing failed. Please try again.")
+                                        error="Order processing failed. Please try again.", STORE_SERVICE_URL=STORE_SERVICE_URL)
     except requests.RequestException:
         total = sum(item[6] * item[5] for item in cart_items)
         return render_template_string(CHECKOUT_HTML, cart_items=cart_items, total=total, 
-                                    error="Order service unavailable. Please try again later.")
+                                    error="Order service unavailable. Please try again later.", STORE_SERVICE_URL=STORE_SERVICE_URL)
 
 @app.route('/order_success')
 def order_success():
+    # Get session_id from query parameter or session
+    session_id = request.args.get('session_id')
+    if session_id:
+        # Use the provided session_id and store it in our session
+        session['session_id'] = session_id
+    
     order_details = session.get('order_details', {})
-    return render_template_string(SUCCESS_HTML, order_details=order_details)
+    # Ensure order_details is a dictionary, not a function
+    if callable(order_details):
+        order_details = {}
+    return render_template_string(SUCCESS_HTML, order_details=order_details, STORE_SERVICE_URL=STORE_SERVICE_URL)
 
 # Cart HTML Template
 CART_HTML = '''
@@ -662,14 +671,14 @@ CART_HTML = '''
                 </div>
                 
                 <div class="cart-actions">
-                    <a href="/" class="btn btn-secondary" style="text-decoration: none;">Continue Shopping</a>
+                    <a href="{{STORE_SERVICE_URL}}" class="btn btn-secondary" style="text-decoration: none;">Continue Shopping</a>
                     <a href="/checkout" class="btn" style="text-decoration: none;">Proceed to Checkout</a>
                 </div>
             {% else %}
                 <div class="empty-cart">
                     <p>Your cart is empty</p>
                     <p>Add some albums to get started!</p>
-                    <a href="/" class="btn" style="text-decoration: none;">Go Shopping</a>
+                    <a href="{{STORE_SERVICE_URL}}" class="btn" style="text-decoration: none;">Go Shopping</a>
                 </div>
             {% endif %}
         </div>
@@ -1434,7 +1443,7 @@ SUCCESS_HTML = '''
                 <br><strong>ROCK ON! 🤘</strong>
             </p>
             
-            {% if order_details %}
+            {% if order_details and order_details.items %}
             <div class="order-details">
                 <h4>📋 Order Summary</h4>
                 
@@ -1454,6 +1463,7 @@ SUCCESS_HTML = '''
                     </div>
                 </div>
 
+                {% if order_details.shipping_info %}
                 <div class="detail-section">
                     <h5>🚚 Shipping Information</h5>
                     <div class="detail-row">
@@ -1477,7 +1487,9 @@ SUCCESS_HTML = '''
                         <span class="detail-value">{{order_details.shipping_info.phone}}</span>
                     </div>
                 </div>
+                {% endif %}
 
+                {% if order_details.payment_info %}
                 <div class="detail-section">
                     <h5>💳 Payment Information</h5>
                     <div class="detail-row">
@@ -1493,12 +1505,13 @@ SUCCESS_HTML = '''
                         <span class="detail-value">{{order_details.payment_info.email}}</span>
                     </div>
                 </div>
+                {% endif %}
             </div>
             {% endif %}
 
             <div style="margin-top: 30px;">
-                <a href="/" class="btn">Continue Shopping</a>
-                <a href="/" class="btn btn-secondary">View Orders</a>
+                <a href="{{STORE_SERVICE_URL}}" class="btn">Continue Shopping</a>
+                <a href="{{STORE_SERVICE_URL}}" class="btn btn-secondary">View Orders</a>
             </div>
         </div>
     </div>
