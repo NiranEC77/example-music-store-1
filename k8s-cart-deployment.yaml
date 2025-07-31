@@ -48,7 +48,7 @@ spec:
         - containerPort: 5002
         env:
         - name: STORE_SERVICE_URL
-          value: "http://store-service:5000"
+          value: "http://music-store-1-service:5000"
         - name: ORDER_SERVICE_URL
           value: "http://order-service:5001"
         - name: CART_DB_PATH

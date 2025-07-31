@@ -55,15 +55,29 @@ def add_to_cart():
     album_id = int(request.form['album_id'])
     quantity = int(request.form['quantity'])
     
-    # Get album details from store service
-    try:
-        response = requests.get(f"{STORE_SERVICE_URL}/api/album/{album_id}")
-        if response.status_code == 200:
-            album = response.json()
-        else:
-            return jsonify({'error': 'Album not found'}), 404
-    except requests.RequestException:
-        return jsonify({'error': 'Store service unavailable'}), 503
+    # Get album details from form data (sent by store service)
+    album_name = request.form.get('album_name')
+    artist = request.form.get('artist')
+    price = float(request.form.get('price', 0))
+    cover_url = request.form.get('cover_url', '')
+    
+    # If album details not provided, try to get from store service
+    if not album_name or not artist:
+        try:
+            api_url = f"{STORE_SERVICE_URL}/api/album/{album_id}"
+            print(f"DEBUG: Trying to connect to store service at: {api_url}")
+            response = requests.get(api_url, timeout=5)
+            if response.status_code == 200:
+                album = response.json()
+                album_name = album['name']
+                artist = album['artist']
+                price = album['price']
+                cover_url = album.get('cover_url', '')
+            else:
+                return jsonify({'error': f'Album not found. Status: {response.status_code}'}), 404
+        except requests.RequestException as e:
+            print(f"DEBUG: Request failed: {e}")
+            return jsonify({'error': f'Store service unavailable: {str(e)}'}), 503
     
     # Add to cart
     with sqlite3.connect(CART_DB_PATH) as conn:
@@ -88,7 +102,7 @@ def add_to_cart():
             c.execute('''
                 INSERT INTO cart_items (session_id, album_id, album_name, artist, price, quantity, cover_url)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', (session['session_id'], album_id, album['name'], album['artist'], album['price'], quantity, album.get('cover_url', '')))
+            ''', (session['session_id'], album_id, album_name, artist, price, quantity, cover_url))
         
         conn.commit()
     

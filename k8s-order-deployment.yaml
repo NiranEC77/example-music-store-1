@@ -48,7 +48,7 @@ spec:
         - containerPort: 5001
         env:
         - name: STORE_SERVICE_URL
-          value: "http://store-service:5000"
+          value: "http://music-store-1-service:5000"
         - name: ORDER_DB_PATH
           value: "/app/data/orders.db"
         volumeMounts:

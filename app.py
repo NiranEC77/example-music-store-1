@@ -574,12 +574,32 @@ def get_album(album_id):
 
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
-    """Forward request to cart service"""
+    """Forward request to cart service with album details"""
     import requests
     
     try:
-        # Forward the POST request to cart service
-        response = requests.post(f"{CART_SERVICE_URL}/add_to_cart", data=request.form)
+        # Get album details first
+        album_id = request.form['album_id']
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute('SELECT * FROM albums WHERE id = %s', (album_id,))
+                album = cur.fetchone()
+        
+        if not album:
+            return jsonify({'error': 'Album not found'}), 404
+        
+        # Prepare data with album details
+        cart_data = {
+            'album_id': album_id,
+            'quantity': request.form['quantity'],
+            'album_name': album['name'],
+            'artist': album['artist'],
+            'price': str(album['price']),
+            'cover_url': album['cover_url'] or ''
+        }
+        
+        # Forward the request to cart service with album details
+        response = requests.post(f"{CART_SERVICE_URL}/add_to_cart", data=cart_data)
         if response.status_code == 302:  # Redirect response
             return redirect(f"{CART_SERVICE_URL}/cart")
         else:
