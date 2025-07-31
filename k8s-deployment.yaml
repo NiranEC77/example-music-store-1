@@ -39,6 +39,8 @@ spec:
           value: "http://cart-service:5002"
         - name: ORDER_SERVICE_URL
           value: "http://order-service:5001"
+        - name: USERS_SERVICE_URL
+          value: "http://users-service:5003"
         - name: DB_HOST
           value: "postgres-service"
         - name: DB_PORT
