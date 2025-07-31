@@ -32,8 +32,15 @@ init_cart_db()
 
 @app.route('/')
 def cart():
-    if 'session_id' not in session:
-        session['session_id'] = os.urandom(16).hex()
+    # Get session_id from query parameter or session
+    session_id = request.args.get('session_id')
+    if not session_id:
+        if 'session_id' not in session:
+            session['session_id'] = os.urandom(16).hex()
+        session_id = session['session_id']
+    else:
+        # Use the provided session_id and store it in our session
+        session['session_id'] = session_id
     
     with sqlite3.connect(CART_DB_PATH) as conn:
         c = conn.cursor()
@@ -41,7 +48,7 @@ def cart():
             SELECT * FROM cart_items 
             WHERE session_id = ? 
             ORDER BY created_at DESC
-        ''', (session['session_id'],)).fetchall()
+        ''', (session_id,)).fetchall()
     
     total = sum(item[6] * item[5] for item in cart_items)  # quantity * price
     
@@ -49,8 +56,15 @@ def cart():
 
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
-    if 'session_id' not in session:
-        session['session_id'] = os.urandom(16).hex()
+    # Get session_id from request or create new one
+    session_id = request.form.get('session_id')
+    if not session_id:
+        if 'session_id' not in session:
+            session['session_id'] = os.urandom(16).hex()
+        session_id = session['session_id']
+    else:
+        # Use the provided session_id and store it in our session
+        session['session_id'] = session_id
     
     album_id = int(request.form['album_id'])
     quantity = int(request.form['quantity'])
@@ -87,7 +101,7 @@ def add_to_cart():
         existing = c.execute('''
             SELECT id, quantity FROM cart_items 
             WHERE session_id = ? AND album_id = ?
-        ''', (session['session_id'], album_id)).fetchone()
+        ''', (session_id, album_id)).fetchone()
         
         if existing:
             # Update quantity
@@ -102,11 +116,17 @@ def add_to_cart():
             c.execute('''
                 INSERT INTO cart_items (session_id, album_id, album_name, artist, price, quantity, cover_url)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', (session['session_id'], album_id, album_name, artist, price, quantity, cover_url))
+            ''', (session_id, album_id, album_name, artist, price, quantity, cover_url))
         
         conn.commit()
     
-    return redirect(url_for('cart'))
+    # Return JSON response with session_id for store service to use
+    return jsonify({
+        'success': True,
+        'message': 'Item added to cart',
+        'session_id': session_id,
+        'redirect_url': url_for('cart')
+    })
 
 @app.route('/update_quantity', methods=['POST'])
 def update_quantity():
@@ -144,8 +164,15 @@ def remove_item():
 
 @app.route('/checkout')
 def checkout():
-    if 'session_id' not in session:
-        return redirect(url_for('cart'))
+    # Get session_id from query parameter or session
+    session_id = request.args.get('session_id')
+    if not session_id:
+        if 'session_id' not in session:
+            return redirect(url_for('cart'))
+        session_id = session['session_id']
+    else:
+        # Use the provided session_id and store it in our session
+        session['session_id'] = session_id
     
     with sqlite3.connect(CART_DB_PATH) as conn:
         c = conn.cursor()
@@ -153,7 +180,7 @@ def checkout():
             SELECT * FROM cart_items 
             WHERE session_id = ? 
             ORDER BY created_at DESC
-        ''', (session['session_id'],)).fetchall()
+        ''', (session_id,)).fetchall()
     
     if not cart_items:
         return redirect(url_for('cart'))

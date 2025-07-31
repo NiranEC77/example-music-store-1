@@ -797,20 +797,34 @@ def add_to_cart():
         if not album:
             return jsonify({'error': 'Album not found'}), 404
         
-        # Prepare data with album details
+        # Get or create session_id
+        if 'cart_session_id' not in session:
+            session['cart_session_id'] = os.urandom(16).hex()
+        
+        # Prepare data with album details and session_id
         cart_data = {
             'album_id': album_id,
             'quantity': request.form['quantity'],
             'album_name': album['name'],
             'artist': album['artist'],
             'price': str(album['price']),
-            'cover_url': album['cover_url'] or ''
+            'cover_url': album['cover_url'] or '',
+            'session_id': session['cart_session_id']
         }
         
         # Forward the request to cart service with album details
         response = requests.post(f"{CART_SERVICE_URL}/add_to_cart", data=cart_data)
-        if response.status_code == 302:  # Redirect response
-            return redirect(f"{CART_SERVICE_URL}/cart")
+        
+        if response.status_code == 200:
+            # Parse JSON response
+            result = response.json()
+            if result.get('success'):
+                # Update session_id if provided
+                if 'session_id' in result:
+                    session['cart_session_id'] = result['session_id']
+                return redirect(f"{CART_SERVICE_URL}/cart")
+            else:
+                return jsonify(result), 400
         else:
             return response.content, response.status_code
     except requests.RequestException as e:
@@ -822,7 +836,15 @@ def view_cart():
     import requests
     
     try:
-        response = requests.get(f"{CART_SERVICE_URL}/")
+        # Get session_id from our session
+        session_id = session.get('cart_session_id')
+        if not session_id:
+            # Create new session if none exists
+            session['cart_session_id'] = os.urandom(16).hex()
+            session_id = session['cart_session_id']
+        
+        # Pass session_id as query parameter
+        response = requests.get(f"{CART_SERVICE_URL}/?session_id={session_id}")
         return response.content, response.status_code
     except requests.RequestException as e:
         return f"Error connecting to cart service: {str(e)}", 503
@@ -833,7 +855,13 @@ def checkout():
     import requests
     
     try:
-        response = requests.get(f"{CART_SERVICE_URL}/checkout")
+        # Get session_id from our session
+        session_id = session.get('cart_session_id')
+        if not session_id:
+            return redirect(url_for('view_cart'))
+        
+        # Pass session_id as query parameter
+        response = requests.get(f"{CART_SERVICE_URL}/checkout?session_id={session_id}")
         return response.content, response.status_code
     except requests.RequestException as e:
         return f"Error connecting to cart service: {str(e)}", 503
