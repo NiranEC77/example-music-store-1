@@ -87,10 +87,29 @@ INDEX_HTML = '''
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Orbitron', 'Arial Black', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 25%, #2d2d2d 50%, #1a1a1a 75%, #0a0a0a 100%);
             min-height: 100vh;
-            color: #333;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(255, 0, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 0, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(255, 0, 0, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
         }
 
         .container {
@@ -102,36 +121,80 @@ INDEX_HTML = '''
         .header {
             text-align: center;
             margin-bottom: 30px;
-            color: white;
+            color: #ffffff;
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .header::before {
+            content: '🤘';
+            font-size: 2rem;
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .header::after {
+            content: '🤘';
+            font-size: 2rem;
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
         }
 
         .header h1 {
-            font-size: 3rem;
-            font-weight: 300;
+            font-size: 4rem;
+            font-weight: 900;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 
+                0 0 10px #ff0000,
+                0 0 20px #ff0000,
+                0 0 30px #ff0000,
+                2px 2px 4px rgba(0,0,0,0.8);
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            background: linear-gradient(45deg, #ffffff, #cccccc, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
+            font-size: 1.4rem;
+            opacity: 0.8;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            font-weight: 600;
         }
 
         .tabs {
             display: flex;
-            background: white;
-            border-radius: 15px 15px 0 0;
+            background: linear-gradient(45deg, #1a1a1a, #2d2d2d, #1a1a1a);
+            border-radius: 0;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 
+                0 5px 15px rgba(0,0,0,0.8),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+            border: 2px solid #333;
+            border-bottom: none;
         }
 
         .tab {
             flex: 1;
             padding: 20px;
             text-align: center;
-            background: #f8f9fa;
+            background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
             border: none;
             cursor: pointer;
+            color: #cccccc;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            border-right: 1px solid #333;
             font-size: 1.1rem;
             font-weight: 500;
             color: #666;
@@ -140,23 +203,36 @@ INDEX_HTML = '''
         }
 
         .tab.active {
-            background: white;
-            color: #667eea;
-            border-bottom-color: #667eea;
+            background: linear-gradient(45deg, #ff0000, #cc0000);
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .tab.active::before {
+            content: '🔥';
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-size: 0.8rem;
         }
 
         .tab:hover {
-            background: #e9ecef;
+            background: linear-gradient(45deg, #2d2d2d, #404040);
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
         }
 
         .cart-tab {
             text-decoration: none;
-            color: #666;
-            background: #f8f9fa;
+            color: #cccccc;
+            background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
             border: none;
             cursor: pointer;
             font-size: 1.1rem;
-            font-weight: 500;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             transition: all 0.3s ease;
             border-bottom: 3px solid transparent;
             padding: 20px;
@@ -165,17 +241,22 @@ INDEX_HTML = '''
         }
 
         .cart-tab:hover {
-            background: #e9ecef;
-            color: #667eea;
+            background: linear-gradient(45deg, #2d2d2d, #404040);
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
         }
 
         .tab-content {
-            background: white;
-            border-radius: 0 0 15px 15px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            border-radius: 0;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 
+                0 10px 30px rgba(0,0,0,0.8),
+                inset 0 1px 0 rgba(255,255,255,0.1);
             backdrop-filter: blur(10px);
             min-height: 600px;
+            border: 2px solid #333;
+            border-top: none;
         }
 
         .content-section {
@@ -187,10 +268,26 @@ INDEX_HTML = '''
         }
 
         .section-title {
-            color: #667eea;
+            color: #ff0000;
             margin-bottom: 25px;
-            font-size: 2rem;
-            font-weight: 600;
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 
+                0 0 10px #ff0000,
+                0 0 20px #ff0000,
+                2px 2px 4px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        .section-title::before {
+            content: '⚡';
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
         }
 
         .album-grid {
@@ -200,16 +297,36 @@ INDEX_HTML = '''
         }
 
         .album-card {
-            background: #f8f9fa;
-            border-radius: 12px;
+            background: linear-gradient(135deg, #2d2d2d 0%, #404040 50%, #2d2d2d 100%);
+            border-radius: 8px;
             padding: 20px;
-            border: 1px solid #e9ecef;
-            transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid #333;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .album-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.1), transparent);
+            transition: left 0.5s ease;
         }
 
         .album-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 
+                0 15px 35px rgba(0,0,0,0.8),
+                0 0 20px rgba(255, 0, 0, 0.3);
+            border-color: #ff0000;
+        }
+
+        .album-card:hover::before {
+            left: 100%;
         }
 
         .album-cover {
@@ -227,22 +344,26 @@ INDEX_HTML = '''
         }
 
         .album-info h3 {
-            color: #333;
+            color: #ffffff;
             margin-bottom: 5px;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
         }
 
         .album-info p {
-            color: #666;
+            color: #cccccc;
             margin-bottom: 15px;
-            font-size: 0.95rem;
+            font-size: 1rem;
+            font-weight: 600;
         }
 
         .album-price {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #667eea;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #ff0000;
             margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
         }
 
         .album-actions {
@@ -260,10 +381,20 @@ INDEX_HTML = '''
 
         .order-form input[type="number"] {
             width: 80px;
-            padding: 8px 12px;
-            border: 2px solid #e9ecef;
+            padding: 10px 12px;
+            border: 2px solid #333;
             border-radius: 6px;
-            font-size: 0.9rem;
+            font-size: 1rem;
+            font-weight: 600;
+            background: #1a1a1a;
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .order-form input[type="number"]:focus {
+            outline: none;
+            border-color: #ff0000;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
         }
 
         .delete-form {
@@ -271,27 +402,37 @@ INDEX_HTML = '''
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            background: linear-gradient(135deg, #8b0000 0%, #660000 100%);
+            border-color: #660000;
         }
 
         .btn-danger:hover {
-            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+            background: linear-gradient(135deg, #660000 0%, #8b0000 100%);
+            border-color: #ff0000;
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.8);
         }
 
         .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
             color: white;
-            border: none;
-            padding: 10px 20px;
+            border: 2px solid #333;
+            padding: 12px 24px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: transform 0.2s;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
 
         .btn:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 
+                0 10px 20px rgba(0,0,0,0.8),
+                0 0 20px rgba(255, 0, 0, 0.5);
+            background: linear-gradient(135deg, #cc0000 0%, #ff0000 100%);
         }
 
         .stats-grid {
@@ -302,22 +443,31 @@ INDEX_HTML = '''
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            color: #ffffff;
             padding: 25px;
-            border-radius: 12px;
+            border-radius: 8px;
             text-align: center;
+            border: 2px solid #333;
+            box-shadow: 
+                0 5px 15px rgba(0,0,0,0.8),
+                inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
         .stat-number {
-            font-size: 2.5rem;
-            font-weight: bold;
+            font-size: 3rem;
+            font-weight: 900;
             margin-bottom: 10px;
+            color: #ff0000;
+            text-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
         }
 
         .stat-label {
-            font-size: 1rem;
+            font-size: 1.1rem;
             opacity: 0.9;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .form-grid {
@@ -332,6 +482,34 @@ INDEX_HTML = '''
 
         .form-group label {
             display: block;
+            color: #ffffff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+        }
+
+        /* Metal-themed animations */
+        @keyframes metalGlow {
+            0% { box-shadow: 0 0 5px rgba(255, 0, 0, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.6); }
+            100% { box-shadow: 0 0 5px rgba(255, 0, 0, 0.3); }
+        }
+
+        @keyframes headbang {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-2deg); }
+            75% { transform: rotate(2deg); }
+        }
+
+        .header h1 {
+            animation: metalGlow 3s ease-in-out infinite;
+        }
+
+        .album-card:hover {
+            animation: headbang 0.5s ease-in-out;
+        }
             margin-bottom: 8px;
             font-weight: 500;
             color: #555;
