@@ -1,4 +1,4 @@
-git pullfrom flask import Flask, render_template_string, request, redirect, url_for, send_from_directory, session, jsonify
+from flask import Flask, render_template_string, request, redirect, url_for, send_from_directory, session, jsonify
 import psycopg2
 import psycopg2.extras
 import os
