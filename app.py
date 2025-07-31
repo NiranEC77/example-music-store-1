@@ -618,5 +618,38 @@ def view_cart():
     except requests.RequestException as e:
         return f"Error connecting to cart service: {str(e)}", 503
 
+@app.route('/checkout')
+def checkout():
+    """Forward request to cart service checkout"""
+    import requests
+    
+    try:
+        response = requests.get(f"{CART_SERVICE_URL}/checkout")
+        return response.content, response.status_code
+    except requests.RequestException as e:
+        return f"Error connecting to cart service: {str(e)}", 503
+
+@app.route('/process_payment', methods=['POST'])
+def process_payment():
+    """Forward payment processing to cart service"""
+    import requests
+    
+    try:
+        response = requests.post(f"{CART_SERVICE_URL}/process_payment", data=request.form)
+        return response.content, response.status_code
+    except requests.RequestException as e:
+        return f"Error connecting to cart service: {str(e)}", 503
+
+@app.route('/order_success')
+def order_success():
+    """Forward order success to cart service"""
+    import requests
+    
+    try:
+        response = requests.get(f"{CART_SERVICE_URL}/order_success")
+        return response.content, response.status_code
+    except requests.RequestException as e:
+        return f"Error connecting to cart service: {str(e)}", 503
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000) 
