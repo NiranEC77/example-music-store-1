@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: users-service
-        image: ghcr.io/niranec77/example-music-store-1-users:1.0.41
+        image: ghcr.io/niranec77/example-music-store-1-users:1.0.42
         ports:
         - containerPort: 5003
         env:
