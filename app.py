@@ -1,4 +1,4 @@
-from flask import Flask, render_template_string, request, redirect, url_for, send_from_directory, session, jsonify
+git pullfrom flask import Flask, render_template_string, request, redirect, url_for, send_from_directory, session, jsonify
 import psycopg2
 import psycopg2.extras
 import os
@@ -1627,39 +1627,19 @@ def verify_token():
 
 @app.route('/admin')
 def admin_panel():
-    """Admin panel - requires authentication"""
-    import requests
+    """Admin panel - authentication handled by JavaScript"""
+    # Get albums and orders for admin panel
+    with get_db_connection() as conn:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute('SELECT * FROM albums ORDER BY created_at DESC')
+            albums = cur.fetchall()
+            cur.execute('''SELECT orders.id, albums.name, albums.artist, orders.quantity, albums.price 
+                          FROM orders JOIN albums ON orders.album_id = albums.id 
+                          ORDER BY orders.created_at DESC''')
+            orders = cur.fetchall()
     
-    # Get token from request headers or query params
-    token = request.headers.get('Authorization', '').replace('Bearer ', '') or request.args.get('token')
-    
-    if not token:
-        return redirect(url_for('index'))
-    
-    try:
-        # Verify token with users service
-        response = requests.post(f"{USERS_SERVICE_URL}/api/verify", json={'token': token})
-        if response.status_code != 200:
-            return redirect(url_for('index'))
-        
-        user_data = response.json()
-        if user_data.get('user', {}).get('role') != 'admin':
-            return redirect(url_for('index'))
-        
-        # Get albums and orders for admin panel
-        with get_db_connection() as conn:
-            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-                cur.execute('SELECT * FROM albums ORDER BY created_at DESC')
-                albums = cur.fetchall()
-                cur.execute('''SELECT orders.id, albums.name, albums.artist, orders.quantity, albums.price 
-                              FROM orders JOIN albums ON orders.album_id = albums.id 
-                              ORDER BY orders.created_at DESC''')
-                orders = cur.fetchall()
-        
-        return render_template_string(ADMIN_HTML, albums=albums, orders=orders, user=user_data['user'])
-        
-    except requests.RequestException as e:
-        return redirect(url_for('index'))
+    # Let JavaScript handle authentication
+    return render_template_string(ADMIN_HTML, albums=albums, orders=orders, user=None)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000) 
