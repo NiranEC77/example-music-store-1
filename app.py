@@ -79,7 +79,7 @@ INDEX_HTML = '''
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vinyl Records Store - Premium Collection</title>
+    <title>Metal Music Store - Brutal Collection</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
@@ -105,13 +105,13 @@ INDEX_HTML = '''
 
         /* Header */
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #1a1a1a;
             color: white;
             padding: 20px 0;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
         }
 
         .header-content {
@@ -593,7 +593,7 @@ INDEX_HTML = '''
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <a href="/" class="logo">Vinyl Records</a>
+                <a href="/" class="logo">🤘 Metal Music Store</a>
                 <div class="nav-actions">
                     <a href="/cart" class="cart-link">🛒 Cart</a>
                     <button class="admin-button" onclick="showLoginModal()">Admin</button>
@@ -602,20 +602,20 @@ INDEX_HTML = '''
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <h1>Discover Premium Vinyl Records</h1>
-            <p>Explore our curated collection of classic and contemporary albums on vinyl</p>
-        </div>
-    </section>
+            <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h1>🤘 Metal Music Store</h1>
+                <p>Discover and collect the most brutal metal albums</p>
+            </div>
+        </section>
 
     <!-- Main Content -->
     <main class="main-content">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Available Albums</h2>
-                <p class="section-subtitle">Browse our collection of carefully selected vinyl records</p>
+                <h2 class="section-title">📀 Available Albums</h2>
+                <p class="section-subtitle">Browse our collection of brutal metal albums</p>
             </div>
 
             {% if albums %}
@@ -650,7 +650,7 @@ INDEX_HTML = '''
             {% else %}
             <div class="empty-state">
                 <h3>No albums available</h3>
-                <p>We're currently updating our collection. Please check back soon or contact the store administrator to add some albums!</p>
+                <p>No brutal metal albums available yet. Contact the store administrator to add some albums!</p>
             </div>
             {% endif %}
         </div>
@@ -798,8 +798,8 @@ INDEX_HTML = '''
             const notification = document.createElement('div');
             notification.className = 'cart-notification';
             notification.innerHTML = `
-                <h3>🎉 Item Added!</h3>
-                <p>Your vinyl record has been added to the cart successfully!</p>
+                <h3>🤘 Item Added!</h3>
+                <p>Your brutal metal album has been added to the cart!</p>
                 <a href="/cart" class="btn">View Cart</a>
                 <button class="btn btn-secondary" onclick="this.parentElement.remove()">Continue Shopping</button>
             `;
@@ -834,6 +834,7 @@ ADMIN_HTML = '''
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Store Administration - Metal Music Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -842,121 +843,87 @@ ADMIN_HTML = '''
         }
 
         body {
-            font-family: 'Orbitron', 'Arial Black', sans-serif;
-            background: linear-gradient(135deg, #404040 0%, #555555 25%, #666666 50%, #555555 75%, #404040 100%);
-            min-height: 100vh;
-            color: #ffffff;
-            margin: 0;
-            padding: 0;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 20%, rgba(255, 0, 0, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255, 0, 0, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 40% 60%, rgba(255, 0, 0, 0.05) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: -1;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 20px;
         }
 
+        /* Header */
         .header {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #ffffff;
-            position: relative;
+            background: #1a1a1a;
+            color: white;
             padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            margin-bottom: 40px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .header h1 {
-            font-size: 4rem;
-            font-weight: 900;
+            font-size: 2.5rem;
+            font-weight: 800;
             margin-bottom: 10px;
-            text-shadow: 
-                0 0 5px #cc0000,
-                0 0 10px #cc0000,
-                2px 2px 4px rgba(0,0,0,0.8);
             color: #ffffff;
-            text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: -0.5px;
         }
 
         .header p {
-            font-size: 1.4rem;
+            font-size: 1.1rem;
             opacity: 0.9;
-            text-shadow: 0 0 5px rgba(204, 0, 0, 0.3);
-            font-weight: 600;
+            font-weight: 500;
         }
 
         .admin-info {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #8b0000 0%, #660000 100%);
+            background: rgba(255,255,255,0.1);
+            color: white;
             padding: 10px 20px;
-            border-radius: 6px;
-            border: 2px solid #333;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.3);
             font-size: 0.9rem;
+            font-weight: 600;
         }
 
         .back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: linear-gradient(135deg, #404040 0%, #333333 100%);
+            background: rgba(255,255,255,0.1);
             color: white;
-            border: 2px solid #333;
-            padding: 10px 20px;
-            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 12px 20px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 0.9rem;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
             transition: all 0.3s ease;
             text-decoration: none;
-            text-shadow: 0 0 3px rgba(255, 255, 255, 0.2);
         }
 
         .back-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.6);
-            background: linear-gradient(135deg, #333333 0%, #404040 100%);
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-1px);
         }
 
         .section-title {
-            color: #cc0000;
+            color: #1a1a1a;
             margin-bottom: 25px;
             font-size: 2.5rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 
-                0 0 5px #cc0000,
-                2px 2px 4px rgba(0,0,0,0.8);
+            font-weight: 700;
+            letter-spacing: -0.5px;
             position: relative;
-        }
-
-        .section-title::before {
-            content: '⚡';
-            position: absolute;
-            left: -30px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1.5rem;
         }
 
         .stats-grid {
@@ -967,31 +934,26 @@ ADMIN_HTML = '''
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
-            color: #ffffff;
+            background: white;
+            color: #1a1a1a;
             padding: 25px;
-            border-radius: 8px;
+            border-radius: 12px;
             text-align: center;
-            border: 2px solid #333;
-            box-shadow: 
-                0 5px 15px rgba(0,0,0,0.8),
-                inset 0 1px 0 rgba(255,255,255,0.1);
+            border: 1px solid #e1e5e9;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
 
         .stat-number {
             font-size: 3rem;
-            font-weight: 900;
+            font-weight: 800;
             margin-bottom: 10px;
-            color: #cc0000;
-            text-shadow: 0 0 8px rgba(204, 0, 0, 0.5);
+            color: #667eea;
         }
 
         .stat-label {
             font-size: 1.1rem;
-            opacity: 0.9;
+            color: #666;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         .form-grid {
@@ -1006,63 +968,53 @@ ADMIN_HTML = '''
 
         .form-group label {
             display: block;
-            color: #ffffff;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            color: #1a1a1a;
+            font-weight: 600;
             margin-bottom: 8px;
-            text-shadow: 0 0 3px rgba(204, 0, 0, 0.2);
+            font-size: 0.9rem;
         }
 
         .form-group input {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #333;
-            border-radius: 6px;
+            padding: 14px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
             font-size: 1rem;
-            transition: border-color 0.2s;
-            background: #1a1a1a;
-            color: #ffffff;
+            transition: border-color 0.3s ease;
+            background: white;
+            color: #1a1a1a;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #cc0000;
-            box-shadow: 0 0 10px rgba(204, 0, 0, 0.3);
+            border-color: #667eea;
         }
 
         .btn {
-            background: linear-gradient(135deg, #8b0000 0%, #660000 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border: 2px solid #333;
-            padding: 10px 16px;
-            border-radius: 6px;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 1rem;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
             transition: all 0.3s ease;
-            text-shadow: 0 0 3px rgba(255, 255, 255, 0.2);
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 
-                0 5px 15px rgba(0,0,0,0.6),
-                0 0 10px rgba(139, 0, 0, 0.3);
-            background: linear-gradient(135deg, #660000 0%, #8b0000 100%);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, #660000 0%, #4d0000 100%);
-            border-color: #4d0000;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            border-color: #c0392b;
         }
 
         .btn-danger:hover {
-            background: linear-gradient(135deg, #4d0000 0%, #660000 100%);
-            border-color: #8b0000;
-            box-shadow: 0 0 15px rgba(102, 0, 0, 0.6);
+            background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3);
         }
 
         .orders-list {
@@ -1072,18 +1024,19 @@ ADMIN_HTML = '''
         }
 
         .order-item {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            background: white;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 10px;
-            border-left: 4px solid #cc0000;
-            border: 2px solid #333;
+            border-left: 4px solid #667eea;
+            border: 1px solid #e1e5e9;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: #cccccc;
+            color: #666;
         }
 
         .empty-state p {
@@ -1099,15 +1052,21 @@ ADMIN_HTML = '''
             .header h1 {
                 font-size: 2rem;
             }
+            
+            .container {
+                padding: 0 16px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <a href="/" class="back-button">← Back to Store</a>
-            <div class="admin-info">
-                Logged in as: {{user.username}}
+            <div class="header-content">
+                <a href="/" class="back-button">← Back to Store</a>
+                <div class="admin-info">
+                    Logged in as: {{user.username}}
+                </div>
             </div>
             <h1>⚙️ Store Administration</h1>
             <p>Manage your brutal metal collection</p>
@@ -1542,4 +1501,4 @@ def admin_panel():
     return render_template_string(ADMIN_HTML, albums=albums, orders=orders, user=None)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000) 
+    app.run(host='0.0.0.0', port=5000, debug=True) 
