@@ -79,7 +79,8 @@ INDEX_HTML = '''
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Metal Music Store - Brutal Collection</title>
+    <title>Vinyl Records Store - Premium Collection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -88,72 +89,272 @@ INDEX_HTML = '''
         }
 
         body {
-            font-family: 'Orbitron', 'Arial Black', sans-serif;
-            background: linear-gradient(135deg, #404040 0%, #555555 25%, #666666 50%, #555555 75%, #404040 100%);
-            min-height: 100vh;
-            color: #ffffff;
-            margin: 0;
-            padding: 0;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 20%, rgba(255, 0, 0, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255, 0, 0, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 40% 60%, rgba(255, 0, 0, 0.05) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: -1;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 20px;
         }
 
+        /* Header */
         .header {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #ffffff;
-            position: relative;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-decoration: none;
+            color: white;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .cart-link {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .cart-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
         }
 
         .admin-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #8b0000 0%, #660000 100%);
+            background: rgba(255,255,255,0.1);
             color: white;
-            border: 2px solid #333;
-            padding: 10px 20px;
-            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 12px 20px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 0.9rem;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
             transition: all 0.3s ease;
             text-decoration: none;
-            text-shadow: 0 0 3px rgba(255, 255, 255, 0.2);
         }
 
         .admin-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 
-                0 5px 15px rgba(0,0,0,0.6),
-                0 0 10px rgba(139, 0, 0, 0.3);
-            background: linear-gradient(135deg, #660000 0%, #8b0000 100%);
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-1px);
         }
 
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 80px 0;
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 400;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 40px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Album Grid */
+        .album-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 80px;
+        }
+
+        .album-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .album-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+        }
+
+        .album-cover-container {
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .album-cover {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .album-card:hover .album-cover {
+            transform: scale(1.05);
+        }
+
+        .album-cover-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #999;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .album-info {
+            padding: 24px;
+        }
+
+        .album-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .album-artist {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .album-price {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .album-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .quantity-input {
+            width: 80px;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .quantity-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .add-to-cart-btn {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-to-cart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #666;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            color: #1a1a1a;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Login Modal */
         .login-modal {
             display: none;
             position: fixed;
@@ -162,473 +363,76 @@ INDEX_HTML = '''
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0,0.8);
+            background-color: rgba(0,0,0,0.5);
             backdrop-filter: blur(5px);
         }
 
         .login-content {
-            background: linear-gradient(135deg, #2d2d2d 0%, #404040 50%, #2d2d2d 100%);
-            margin: 15% auto;
-            padding: 30px;
-            border: 2px solid #333;
-            border-radius: 15px;
-            width: 400px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            color: #ffffff;
+            background: white;
+            margin: 10% auto;
+            padding: 40px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
         }
 
-        .login-content h2 {
-            color: #8b0000;
-            margin-bottom: 20px;
+        .login-header {
             text-align: center;
-            text-shadow: 0 0 5px rgba(139, 0, 0, 0.3);
-        }
-
-        .login-form input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 2px solid #333;
-            border-radius: 6px;
-            background: #1a1a1a;
-            color: #ffffff;
-            font-size: 1rem;
-        }
-
-        .login-form input:focus {
-            outline: none;
-            border-color: #8b0000;
-            box-shadow: 0 0 10px rgba(139, 0, 0, 0.3);
-        }
-
-        .login-form button {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #8b0000 0%, #660000 100%);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-
-        .login-form button:hover {
-            background: linear-gradient(135deg, #660000 0%, #8b0000 100%);
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close:hover {
-            color: #8b0000;
-        }
-
-        .error-message {
-            color: #ff6b6b;
-            text-align: center;
-            margin: 10px 0;
-            display: none;
-        }
-
-        .header::before {
-            content: '🤘';
-            font-size: 2rem;
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .header::after {
-            content: '🤘';
-            font-size: 2rem;
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .header h1 {
-            font-size: 4rem;
-            font-weight: 900;
-            margin-bottom: 10px;
-            text-shadow: 
-                0 0 5px #cc0000,
-                0 0 10px #cc0000,
-                2px 2px 4px rgba(0,0,0,0.8);
-            color: #ffffff;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
-
-        .header p {
-            font-size: 1.4rem;
-            opacity: 0.9;
-            text-shadow: 0 0 5px rgba(204, 0, 0, 0.3);
-            font-weight: 600;
-        }
-
-        .tabs {
-            display: flex;
-            background: linear-gradient(45deg, #1a1a1a, #2d2d2d, #1a1a1a);
-            border-radius: 0;
-            overflow: hidden;
-            box-shadow: 
-                0 5px 15px rgba(0,0,0,0.8),
-                inset 0 1px 0 rgba(255,255,255,0.1);
-            border: 2px solid #333;
-            border-bottom: none;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 20px;
-            text-align: center;
-            background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
-            border: none;
-            cursor: pointer;
-            color: #cccccc;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            position: relative;
-            border-right: 1px solid #333;
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: #666;
-            transition: all 0.3s ease;
-            border-bottom: 3px solid transparent;
-        }
-
-        .tab.active {
-            background: linear-gradient(45deg, #8b0000, #660000);
-            color: #ffffff;
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
-        }
-
-        .tab.active::before {
-            content: '🔥';
-            position: absolute;
-            top: 5px;
-            right: 10px;
-            font-size: 0.8rem;
-        }
-
-        .tab:hover {
-            background: linear-gradient(45deg, #2d2d2d, #404040);
-            color: #ffffff;
-            text-shadow: 0 0 5px rgba(204, 0, 0, 0.3);
-        }
-
-        .cart-tab {
-            text-decoration: none;
-            color: #cccccc;
-            background: linear-gradient(45deg, #1a1a1a, #2d2d2d);
-            border: none;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            border-bottom: 3px solid transparent;
-            padding: 20px;
-            text-align: center;
-            flex: 1;
-        }
-
-        .cart-tab:hover {
-            background: linear-gradient(45deg, #2d2d2d, #404040);
-            color: #ffffff;
-            text-shadow: 0 0 5px rgba(204, 0, 0, 0.3);
-        }
-
-        .tab-content {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
-            border-radius: 0;
-            padding: 30px;
-            box-shadow: 
-                0 10px 30px rgba(0,0,0,0.8),
-                inset 0 1px 0 rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            min-height: 600px;
-            border: 2px solid #333;
-            border-top: none;
-        }
-
-        .content-section {
-            display: none;
-        }
-
-        .content-section.active {
-            display: block;
-        }
-
-        .section-title {
-            color: #cc0000;
-            margin-bottom: 25px;
-            font-size: 2.5rem;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 
-                0 0 5px #cc0000,
-                2px 2px 4px rgba(0,0,0,0.8);
-            position: relative;
-        }
-
-        .section-title::before {
-            content: '⚡';
-            position: absolute;
-            left: -30px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1.5rem;
-        }
-
-        .album-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-        }
-
-        .album-card {
-            background: linear-gradient(135deg, #2d2d2d 0%, #404040 50%, #2d2d2d 100%);
-            border-radius: 8px;
-            padding: 20px;
-            border: 2px solid #333;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-
-        .album-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.1), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .album-card:hover {
-            border-color: #8b0000;
-        }
-
-        .album-card:hover::before {
-            left: 100%;
-        }
-
-        .album-cover {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 0.9rem;
-        }
-
-        .album-info h3 {
-            color: #ffffff;
-            margin-bottom: 5px;
-            font-size: 1.3rem;
-            font-weight: 700;
-            text-shadow: 0 0 3px rgba(204, 0, 0, 0.3);
-        }
-
-        .album-info p {
-            color: #cccccc;
-            margin-bottom: 15px;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        .album-price {
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: #cc0000;
-            margin-bottom: 15px;
-            text-shadow: 0 0 5px rgba(204, 0, 0, 0.3);
-        }
-
-        .album-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            align-items: stretch;
-            margin-top: auto;
-        }
-
-        .order-form {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .order-form input[type="number"] {
-            width: 60px;
-            padding: 8px 10px;
-            border: 2px solid #333;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            background: #1a1a1a;
-            color: #ffffff;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .order-form input[type="number"]:focus {
-            outline: none;
-            border-color: #ff0000;
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
-        }
-
-        .delete-form {
-            display: inline;
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #660000 0%, #4d0000 100%);
-            border-color: #4d0000;
-            margin-top: 8px;
-        }
-
-        .btn-danger:hover {
-            background: linear-gradient(135deg, #4d0000 0%, #660000 100%);
-            border-color: #8b0000;
-            box-shadow: 0 0 15px rgba(102, 0, 0, 0.6);
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #8b0000 0%, #660000 100%);
-            color: white;
-            border: 2px solid #333;
-            padding: 10px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            text-shadow: 0 0 3px rgba(255, 255, 255, 0.2);
-            width: 100%;
-            margin-top: auto;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 
-                0 5px 15px rgba(0,0,0,0.6),
-                0 0 10px rgba(139, 0, 0, 0.3);
-            background: linear-gradient(135deg, #660000 0%, #8b0000 100%);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
             margin-bottom: 30px;
         }
 
-        .stat-card {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
-            color: #ffffff;
-            padding: 25px;
-            border-radius: 8px;
-            text-align: center;
-            border: 2px solid #333;
-            box-shadow: 
-                0 5px 15px rgba(0,0,0,0.8),
-                inset 0 1px 0 rgba(255,255,255,0.1);
+        .login-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
         }
 
-        .stat-number {
-            font-size: 3rem;
-            font-weight: 900;
-            margin-bottom: 10px;
-            color: #cc0000;
-            text-shadow: 0 0 8px rgba(204, 0, 0, 0.5);
+        .login-subtitle {
+            color: #666;
+            font-size: 1rem;
         }
 
-        .stat-label {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.3s ease;
         }
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
+        .close:hover {
+            color: #1a1a1a;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .form-group label {
-            display: block;
-            color: #ffffff;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-            text-shadow: 0 0 3px rgba(204, 0, 0, 0.2);
-        }
-
-        /* Metal-themed animations */
-        @keyframes metalGlow {
-            0% { box-shadow: 0 0 3px rgba(204, 0, 0, 0.2); }
-            50% { box-shadow: 0 0 10px rgba(204, 0, 0, 0.4); }
-            100% { box-shadow: 0 0 3px rgba(204, 0, 0, 0.2); }
-        }
-
-        @keyframes headbang {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(-2deg); }
-            75% { transform: rotate(2deg); }
-        }
-
-        .header h1 {
-            animation: metalGlow 3s ease-in-out infinite;
-        }
-
-
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #555;
+            font-weight: 600;
+            color: #1a1a1a;
+            font-size: 0.9rem;
         }
 
         .form-group input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 6px;
+            padding: 14px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
             font-size: 1rem;
-            transition: border-color 0.2s;
+            transition: border-color 0.3s ease;
         }
 
         .form-group input:focus {
@@ -636,45 +440,46 @@ INDEX_HTML = '''
             border-color: #667eea;
         }
 
-        .orders-list {
-            list-style: none;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .order-item {
-            background: #f8f9fa;
-            padding: 15px;
+        .login-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px;
             border-radius: 8px;
-            margin-bottom: 10px;
-            border-left: 4px solid #667eea;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
         }
 
-        .empty-state {
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .error-message {
+            color: #e74c3c;
             text-align: center;
-            padding: 40px 20px;
-            color: #666;
+            margin: 10px 0;
+            display: none;
+            font-size: 0.9rem;
         }
 
-        .empty-state p {
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-        }
-
+        /* Cart Notification */
         .cart-notification {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: linear-gradient(135deg, #2d2d2d 0%, #404040 50%, #2d2d2d 100%);
-            border: 2px solid #8b0000;
-            border-radius: 10px;
-            padding: 20px;
-            color: #ffffff;
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
             z-index: 1000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             transform: translateX(400px);
             transition: transform 0.3s ease;
-            max-width: 300px;
+            max-width: 320px;
+            border: 1px solid #e1e5e9;
         }
 
         .cart-notification.show {
@@ -682,100 +487,195 @@ INDEX_HTML = '''
         }
 
         .cart-notification h3 {
-            color: #8b0000;
-            margin-bottom: 10px;
-            text-shadow: 0 0 5px rgba(139, 0, 0, 0.3);
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
         }
 
         .cart-notification p {
-            margin-bottom: 15px;
-            color: #cccccc;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
         }
 
         .cart-notification .btn {
-            margin: 5px;
-            padding: 8px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
             font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 10px;
         }
 
+        .cart-notification .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .cart-notification .btn-secondary {
+            background: #f8f9fa;
+            color: #666;
+            border: 1px solid #e1e5e9;
+        }
+
+        .cart-notification .btn-secondary:hover {
+            background: #e9ecef;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
+            .container {
+                padding: 0 16px;
             }
-            
-            .header h1 {
+
+            .hero {
+                padding: 60px 0;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .section-title {
                 font-size: 2rem;
             }
-            
+
+            .album-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 20px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .nav-actions {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
             .album-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .album-actions {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .quantity-input {
+                width: 100%;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1><a href="/" style="text-decoration: none; color: inherit;">🤘 Metal Music Store</a></h1>
-            <p>Discover and collect the most brutal metal albums</p>
-            <button class="admin-button" onclick="showLoginModal()">⚙️ Store Administration</button>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">Vinyl Records</a>
+                <div class="nav-actions">
+                    <a href="/cart" class="cart-link">🛒 Cart</a>
+                    <button class="admin-button" onclick="showLoginModal()">Admin</button>
+                </div>
+            </div>
         </div>
+    </header>
 
-        <div class="tabs">
-            <button class="tab active" onclick="showTab('shop')">🛍️ Shop</button>
-            <a href="/cart" class="tab cart-tab">🛒 Cart</a>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Discover Premium Vinyl Records</h1>
+            <p>Explore our curated collection of classic and contemporary albums on vinyl</p>
         </div>
+    </section>
 
-        <div class="tab-content">
-            <!-- Shop Tab -->
-            <div id="shop" class="content-section active">
-                <h2 class="section-title">📀 Available Albums</h2>
-                {% if albums %}
-                <div class="album-grid">
-                    {% for a in albums %}
-                    <div class="album-card">
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Available Albums</h2>
+                <p class="section-subtitle">Browse our collection of carefully selected vinyl records</p>
+            </div>
+
+            {% if albums %}
+            <div class="album-grid">
+                {% for a in albums %}
+                <div class="album-card">
+                    <div class="album-cover-container">
                         {% if a.cover_url %}
-                        <img src="{{a.cover_url}}" alt="Album cover" class="album-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="album-cover" style="display: none;">{{a.name}}</div>
+                        <img src="{{a.cover_url}}" alt="{{a.name}} cover" class="album-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="album-cover-placeholder" style="display: none;">{{a.name}}</div>
                         {% else %}
-                        <div class="album-cover">{{a.name}}</div>
+                        <div class="album-cover-placeholder">{{a.name}}</div>
                         {% endif %}
-                        <div class="album-info">
-                            <h3>{{a.name}}</h3>
-                            <p>by {{a.artist}}</p>
-                            <div class="album-price">${{"%.2f"|format(a.price)}}</div>
-                            <div class="album-actions">
-                                <form action="/add_to_cart" method="post" class="order-form" onsubmit="return addToCart(event, this)">
-                                    <input type="hidden" name="album_id" value="{{a.id}}">
-                                    <input type="number" name="quantity" value="1" min="1" placeholder="Qty">
-                                    <button type="submit" class="btn">Add to Cart</button>
-                                </form>
-                            </div>
+                    </div>
+                    <div class="album-info">
+                        <h3 class="album-title">{{a.name}}</h3>
+                        <p class="album-artist">{{a.artist}}</p>
+                        <div class="album-price">${{"%.2f"|format(a.price)}}</div>
+                        <div class="album-actions">
+                            <form action="/add_to_cart" method="post" onsubmit="return addToCart(event, this)">
+                                <input type="hidden" name="album_id" value="{{a.id}}">
+                                <div style="display: flex; gap: 12px; align-items: center;">
+                                    <input type="number" name="quantity" value="1" min="1" class="quantity-input" placeholder="Qty">
+                                    <button type="submit" class="add-to-cart-btn">Add to Cart</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
-                {% else %}
-                <div class="empty-state">
-                    <p>No albums available yet.</p>
-                    <p>Contact the store administrator to add some albums!</p>
-                </div>
-                {% endif %}
+                {% endfor %}
             </div>
+            {% else %}
+            <div class="empty-state">
+                <h3>No albums available</h3>
+                <p>We're currently updating our collection. Please check back soon or contact the store administrator to add some albums!</p>
+            </div>
+            {% endif %}
         </div>
+    </main>
 
-        <!-- Login Modal -->
-        <div id="loginModal" class="login-modal">
-            <div class="login-content">
-                <span class="close" onclick="closeLoginModal()">&times;</span>
-                <h2>🔐 Store Administration Login</h2>
-                <div class="error-message" id="loginError"></div>
-                <form class="login-form" onsubmit="return handleLogin(event)">
-                    <input type="text" id="username" name="username" placeholder="Username" required>
-                    <input type="password" id="password" name="password" placeholder="Password" required>
-                    <button type="submit">Login</button>
-                </form>
+    <!-- Login Modal -->
+    <div id="loginModal" class="login-modal">
+        <div class="login-content">
+            <span class="close" onclick="closeLoginModal()">&times;</span>
+            <div class="login-header">
+                <h2 class="login-title">Store Administration</h2>
+                <p class="login-subtitle">Sign in to manage your store</p>
             </div>
+            <div class="error-message" id="loginError"></div>
+            <form class="login-form" onsubmit="return handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="login-btn">Sign In</button>
+            </form>
         </div>
     </div>
 
@@ -898,9 +798,9 @@ INDEX_HTML = '''
             const notification = document.createElement('div');
             notification.className = 'cart-notification';
             notification.innerHTML = `
-                <h3>🤘 Item Added!</h3>
-                <p>Your brutal metal album has been added to the cart!</p>
-                <button class="btn" onclick="window.location.href='/cart'">🛒 Checkout</button>
+                <h3>🎉 Item Added!</h3>
+                <p>Your vinyl record has been added to the cart successfully!</p>
+                <a href="/cart" class="btn">View Cart</a>
                 <button class="btn btn-secondary" onclick="this.parentElement.remove()">Continue Shopping</button>
             `;
             
@@ -911,7 +811,7 @@ INDEX_HTML = '''
                 notification.classList.add('show');
             }, 100);
             
-            // Auto-hide after 10 seconds
+            // Auto-hide after 8 seconds
             setTimeout(() => {
                 notification.classList.remove('show');
                 setTimeout(() => {
@@ -919,7 +819,7 @@ INDEX_HTML = '''
                         notification.remove();
                     }
                 }, 300);
-            }, 10000);
+            }, 8000);
         }
     </script>
 </body>
