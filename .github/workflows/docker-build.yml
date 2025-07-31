@@ -102,6 +102,15 @@ jobs:
             ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-order:${{ env.VERSION }}
             ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-order:latest
 
+      - name: Build and push Users Service
+        uses: docker/build-push-action@v5
+        with:
+          context: ./users-service
+          push: true
+          tags: |
+            ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-users:${{ env.VERSION }}
+            ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-users:latest
+
       - name: Build and push Database Service
         uses: docker/build-push-action@v5
         with:
@@ -122,6 +131,9 @@ jobs:
           # Update order service deployment
           sed -i "s|image: ghcr.io/niranec77/.*-order:.*|image: ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-order:${{ env.VERSION }}|" k8s-order-deployment.yaml
           
+          # Update users service deployment
+          sed -i "s|image: ghcr.io/niranec77/.*-users:.*|image: ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-users:${{ env.VERSION }}|" k8s-users-deployment.yaml
+          
           # Update database service deployment
           sed -i "s|image: postgres:15-alpine|image: ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-database:${{ env.VERSION }}|" k8s-database-deployment.yaml
 
@@ -129,7 +141,7 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add VERSION k8s-deployment.yaml k8s-cart-deployment.yaml k8s-order-deployment.yaml k8s-database-deployment.yaml
+          git add VERSION k8s-deployment.yaml k8s-cart-deployment.yaml k8s-order-deployment.yaml k8s-users-deployment.yaml k8s-database-deployment.yaml
           git commit -m "Auto-increment version to ${{ env.VERSION }} and update all k8s deployments" || echo "No changes to commit"
           git push origin main || echo "Push failed or no changes"
 
@@ -149,6 +161,10 @@ jobs:
           echo "  - ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-order:${{ env.VERSION }}"
           echo "  - ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-order:latest"
           echo ""
+          echo "🔐 Users Service:"
+          echo "  - ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-users:${{ env.VERSION }}"
+          echo "  - ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-users:latest"
+          echo ""
           echo "🗄️ Database Service:"
           echo "  - ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-database:${{ env.VERSION }}"
           echo "  - ghcr.io/${{ env.OWNER_NAME }}/${{ env.REPO_NAME }}-database:latest"
@@ -157,6 +173,7 @@ jobs:
           echo "  - k8s-deployment.yaml (Store Service)"
           echo "  - k8s-cart-deployment.yaml (Cart Service)"
           echo "  - k8s-order-deployment.yaml (Order Service)"
+          echo "  - k8s-users-deployment.yaml (Users Service)"
           echo "  - k8s-database-deployment.yaml (Database Service)"
           echo ""
           echo "🚀 To deploy all services to Kubernetes, run:"
@@ -164,6 +181,7 @@ jobs:
           echo "kubectl apply -f k8s-deployment.yaml"
           echo "kubectl apply -f k8s-cart-deployment.yaml"
           echo "kubectl apply -f k8s-order-deployment.yaml"
+          echo "kubectl apply -f k8s-users-deployment.yaml"
           echo ""
           echo "🐳 To run locally with Docker Compose:"
           echo "docker-compose up --build" 
