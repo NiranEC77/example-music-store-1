@@ -61,7 +61,8 @@ spec:
   selector:
     app: music-store-1
   ports:
-    - protocol: TCP
+    - name: http
+      protocol: TCP
       port: 5000
       targetPort: 5000
       nodePort: 30007 

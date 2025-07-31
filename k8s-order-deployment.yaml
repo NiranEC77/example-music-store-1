@@ -18,7 +18,8 @@ spec:
   selector:
     app: order-service
   ports:
-    - protocol: TCP
+    - name: http
+      protocol: TCP
       port: 5001
       targetPort: 5001
   type: LoadBalancer
