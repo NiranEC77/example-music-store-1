@@ -45,12 +45,7 @@ spec:
           value: "music_user"
         - name: DB_PASSWORD
           value: "music_password"
-        volumeMounts:
-        - name: static-files
-          mountPath: /app/static
-      volumes:
-      - name: static-files
-        emptyDir: {}
+        # Static files are included in the Docker image, no volume mount needed
 ---
 apiVersion: v1
 kind: Service

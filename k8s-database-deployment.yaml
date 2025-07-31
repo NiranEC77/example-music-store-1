@@ -112,12 +112,12 @@ data:
         FOR EACH ROW 
         EXECUTE FUNCTION update_updated_at_column();
 
-    -- Insert some sample data with correct Wikipedia album cover URLs
+    -- Insert some sample data with local album cover images
     INSERT INTO albums (name, artist, price, cover_url) VALUES
-        ('Vulgar Display of Power', 'Pantera', 24.99, 'https://upload.wikimedia.org/wikipedia/en/8/87/Pantera_-_Vulgar_Display_of_Power.jpg'),
-        ('...And Justice for All', 'Metallica', 22.99, 'https://upload.wikimedia.org/wikipedia/en/b/bd/Metallica_-_...And_Justice_for_All_cover.jpg'),
-        ('Superunknown', 'Soundgarden', 21.99, 'https://upload.wikimedia.org/wikipedia/en/3/3c/Soundgarden_-_Superunknown.jpg'),
-        ('Colony', 'In Flames', 19.99, 'https://upload.wikimedia.org/wikipedia/en/8/8a/In_Flames_-_Colony.jpg'),
-        ('System of a Down', 'System of a Down', 20.99, 'https://upload.wikimedia.org/wikipedia/en/6/64/System_of_a_down.jpg'),
-        ('Somewhere in Time', 'Iron Maiden', 23.99, 'https://upload.wikimedia.org/wikipedia/en/9/9c/Iron_Maiden_-_Somewhere_in_Time.jpg')
+        ('Vulgar Display of Power', 'Pantera', 24.99, '/static/covers/Pantera-VulgarDisplayofPower.jpg'),
+        ('...And Justice for All', 'Metallica', 22.99, '/static/covers/Metallica_-_...And_Justice_for_All_cover.jpg'),
+        ('Superunknown', 'Soundgarden', 21.99, '/static/covers/Sound_garden-Superunknown.jpg'),
+        ('Colony', 'In Flames', 19.99, '/static/covers/Inflames_colony.jpeg'),
+        ('System of a Down', 'System of a Down', 20.99, '/static/covers/System_of_a_down-system_of_a_down.jpg'),
+        ('Somewhere in Time', 'Iron Maiden', 23.99, '/static/covers/Iron_Maiden-Somewhere_in_Time.jpg')
     ON CONFLICT DO NOTHING; 
