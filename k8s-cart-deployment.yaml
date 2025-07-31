@@ -45,7 +45,7 @@ spec:
     spec:
       containers:
       - name: cart-service
-        image: ghcr.io/niranec77/example-music-store-1-cart:1.0.27
+        image: ghcr.io/niranec77/example-music-store-1-cart:1.0.28
         imagePullPolicy: Always
         ports:
         - containerPort: 5002
