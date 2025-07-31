@@ -88,7 +88,7 @@ INDEX_HTML = '''
 
         body {
             font-family: 'Orbitron', 'Arial Black', sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 25%, #2d2d2d 50%, #1a1a1a 75%, #0a0a0a 100%);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 25%, #404040 50%, #2d2d2d 75%, #1a1a1a 100%);
             min-height: 100vh;
             color: #ffffff;
             margin: 0;
@@ -198,7 +198,7 @@ INDEX_HTML = '''
         }
 
         .tab.active {
-            background: linear-gradient(45deg, #cc0000, #990000);
+            background: linear-gradient(45deg, #8b0000, #660000);
             color: #ffffff;
             text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
             box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
@@ -298,6 +298,9 @@ INDEX_HTML = '''
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .album-card::before {
@@ -362,27 +365,30 @@ INDEX_HTML = '''
 
         .album-actions {
             display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
+            flex-direction: column;
+            gap: 8px;
+            align-items: stretch;
+            margin-top: auto;
         }
 
         .order-form {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
+            margin-bottom: 8px;
         }
 
         .order-form input[type="number"] {
-            width: 80px;
-            padding: 10px 12px;
+            width: 60px;
+            padding: 8px 10px;
             border: 2px solid #333;
             border-radius: 6px;
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 600;
             background: #1a1a1a;
             color: #ffffff;
             transition: all 0.3s ease;
+            text-align: center;
         }
 
         .order-form input[type="number"]:focus {
@@ -396,37 +402,40 @@ INDEX_HTML = '''
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, #8b0000 0%, #660000 100%);
-            border-color: #660000;
+            background: linear-gradient(135deg, #660000 0%, #4d0000 100%);
+            border-color: #4d0000;
+            margin-top: 8px;
         }
 
         .btn-danger:hover {
-            background: linear-gradient(135deg, #660000 0%, #8b0000 100%);
-            border-color: #ff0000;
-            box-shadow: 0 0 20px rgba(139, 0, 0, 0.8);
+            background: linear-gradient(135deg, #4d0000 0%, #660000 100%);
+            border-color: #8b0000;
+            box-shadow: 0 0 15px rgba(102, 0, 0, 0.6);
         }
 
         .btn {
-            background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+            background: linear-gradient(135deg, #8b0000 0%, #660000 100%);
             color: white;
             border: 2px solid #333;
-            padding: 12px 24px;
+            padding: 10px 16px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 1rem;
-            font-weight: 700;
+            font-size: 0.9rem;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: all 0.3s ease;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            text-shadow: 0 0 3px rgba(255, 255, 255, 0.2);
+            width: 100%;
+            margin-top: auto;
         }
 
         .btn:hover {
-            transform: translateY(-3px) scale(1.05);
+            transform: translateY(-2px);
             box-shadow: 
-                0 10px 20px rgba(0,0,0,0.8),
-                0 0 15px rgba(204, 0, 0, 0.4);
-            background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
+                0 5px 15px rgba(0,0,0,0.6),
+                0 0 10px rgba(139, 0, 0, 0.3);
+            background: linear-gradient(135deg, #660000 0%, #8b0000 100%);
         }
 
         .stats-grid {

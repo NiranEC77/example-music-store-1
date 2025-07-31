@@ -320,7 +320,7 @@ CART_HTML = '''
 
         body {
             font-family: 'Orbitron', 'Arial Black', sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 25%, #2d2d2d 50%, #1a1a1a 75%, #0a0a0a 100%);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 25%, #404040 50%, #2d2d2d 75%, #1a1a1a 100%);
             min-height: 100vh;
             color: #ffffff;
             margin: 0;
@@ -466,37 +466,37 @@ CART_HTML = '''
         }
 
         .btn {
-            background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+            background: linear-gradient(135deg, #8b0000 0%, #660000 100%);
             color: white;
             border: 2px solid #333;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 1rem;
-            font-weight: 700;
+            font-size: 0.9rem;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: all 0.3s ease;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+            text-shadow: 0 0 3px rgba(255, 255, 255, 0.2);
         }
 
         .btn:hover {
-            transform: translateY(-3px) scale(1.05);
+            transform: translateY(-2px);
             box-shadow: 
-                0 10px 20px rgba(0,0,0,0.8),
-                0 0 15px rgba(204, 0, 0, 0.4);
-            background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
+                0 5px 15px rgba(0,0,0,0.6),
+                0 0 10px rgba(139, 0, 0, 0.3);
+            background: linear-gradient(135deg, #660000 0%, #8b0000 100%);
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, #8b0000 0%, #660000 100%);
-            border-color: #660000;
+            background: linear-gradient(135deg, #660000 0%, #4d0000 100%);
+            border-color: #4d0000;
         }
 
         .btn-danger:hover {
-            background: linear-gradient(135deg, #660000 0%, #8b0000 100%);
-            border-color: #cc0000;
-            box-shadow: 0 0 20px rgba(139, 0, 0, 0.8);
+            background: linear-gradient(135deg, #4d0000 0%, #660000 100%);
+            border-color: #8b0000;
+            box-shadow: 0 0 15px rgba(102, 0, 0, 0.6);
         }
 
         .cart-total {
