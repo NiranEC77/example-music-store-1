@@ -1,27 +1,5 @@
--- Create version table to track database schema version
-CREATE TABLE IF NOT EXISTS db_version (
-    id INTEGER PRIMARY KEY,
-    version VARCHAR(50) NOT NULL,
-    applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Check current version
-DO $$
-DECLARE
-    current_version VARCHAR(50);
-BEGIN
-    SELECT version INTO current_version FROM db_version WHERE id = 1;
-    
-            -- If version is different or doesn't exist, reinitialize
-        IF current_version IS NULL OR current_version != '1.0.16' THEN
-        -- Drop existing tables
-        DROP TABLE IF EXISTS albums CASCADE;
-        
-        -- Update version
-        DELETE FROM db_version WHERE id = 1;
-                    INSERT INTO db_version (id, version) VALUES (1, '1.0.16');
-    END IF;
-END $$;
+-- Simple initialization - always recreate tables with latest data
+DROP TABLE IF EXISTS albums CASCADE;
 
 -- Create albums table
 CREATE TABLE IF NOT EXISTS albums (

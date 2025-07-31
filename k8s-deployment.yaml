@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
       - name: music-store-1
-        image: ghcr.io/niranec77/example-music-store-1-store:1.0.5
+        image: ghcr.io/niranec77/example-music-store-1-store:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
