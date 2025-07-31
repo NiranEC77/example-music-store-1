@@ -379,9 +379,10 @@ INDEX_HTML = '''
                                             {% for a in albums %}
                         <div class="album-card">
                             {% if a.cover_url %}
-                            <img src="{{a.cover_url}}" alt="Album cover" class="album-cover">
+                            <img src="{{a.cover_url}}" alt="Album cover" class="album-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="album-cover" style="display: none;">{{a.name}}</div>
                             {% else %}
-                            <div class="album-cover">No Cover</div>
+                            <div class="album-cover">{{a.name}}</div>
                             {% endif %}
                             <div class="album-info">
                                 <h3>{{a.name}}</h3>
