@@ -2,6 +2,7 @@ from flask import Flask, render_template_string, request, redirect, url_for, sen
 import psycopg2
 import psycopg2.extras
 import os
+import requests
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -573,17 +574,29 @@ def get_album(album_id):
 
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
-    """Redirect to cart service"""
-    album_id = request.form['album_id']
-    quantity = request.form['quantity']
+    """Forward request to cart service"""
+    import requests
     
-    # Redirect to cart service with parameters
-    return redirect(f"{CART_SERVICE_URL}/add_to_cart?album_id={album_id}&quantity={quantity}")
+    try:
+        # Forward the POST request to cart service
+        response = requests.post(f"{CART_SERVICE_URL}/add_to_cart", data=request.form)
+        if response.status_code == 302:  # Redirect response
+            return redirect(f"{CART_SERVICE_URL}/cart")
+        else:
+            return response.content, response.status_code
+    except requests.RequestException as e:
+        return f"Error connecting to cart service: {str(e)}", 503
 
 @app.route('/cart')
 def view_cart():
-    """Redirect to cart service"""
-    return redirect(CART_SERVICE_URL)
+    """Forward request to cart service"""
+    import requests
+    
+    try:
+        response = requests.get(f"{CART_SERVICE_URL}/")
+        return response.content, response.status_code
+    except requests.RequestException as e:
+        return f"Error connecting to cart service: {str(e)}", 503
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000) 
