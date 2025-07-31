@@ -12,14 +12,14 @@ DECLARE
 BEGIN
     SELECT version INTO current_version FROM db_version WHERE id = 1;
     
-    -- If version is different or doesn't exist, reinitialize
-    IF current_version IS NULL OR current_version != '1.0.6' THEN
+            -- If version is different or doesn't exist, reinitialize
+        IF current_version IS NULL OR current_version != '1.0.12' THEN
         -- Drop existing tables
         DROP TABLE IF EXISTS albums CASCADE;
         
         -- Update version
         DELETE FROM db_version WHERE id = 1;
-        INSERT INTO db_version (id, version) VALUES (1, '1.0.6');
+                    INSERT INTO db_version (id, version) VALUES (1, '1.0.12');
     END IF;
 END $$;
 

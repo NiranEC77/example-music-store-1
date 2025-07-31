@@ -37,11 +37,6 @@ def allowed_file(filename):
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-@app.route('/static/<path:filename>')
-def static_files(filename):
-    """Serve static files"""
-    return send_from_directory('static', filename)
-
 # Main HTML Template
 INDEX_HTML = '''
 <!DOCTYPE html>
