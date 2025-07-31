@@ -228,6 +228,7 @@ ORDERS_DASHBOARD_HTML = '''
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orders Dashboard - Metal Music Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -236,85 +237,47 @@ ORDERS_DASHBOARD_HTML = '''
         }
 
         body {
-            font-family: 'Orbitron', 'Arial Black', sans-serif;
-            background: linear-gradient(135deg, #404040 0%, #555555 25%, #666666 50%, #555555 75%, #404040 100%);
-            min-height: 100vh;
-            color: #ffffff;
-            margin: 0;
-            padding: 0;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 20%, rgba(204, 0, 0, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(204, 0, 0, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 40% 60%, rgba(204, 0, 0, 0.03) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: -1;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 20px;
         }
 
+        /* Header */
         .header {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #ffffff;
-            position: relative;
+            background: #1a1a1a;
+            color: white;
             padding: 20px 0;
-        }
-
-        .header::before {
-            content: '🤘';
-            font-size: 2rem;
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .header::after {
-            content: '🤘';
-            font-size: 2rem;
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            margin-bottom: 40px;
+            text-align: center;
         }
 
         .header h1 {
-            font-size: 3rem;
-            font-weight: 900;
+            font-size: 2.5rem;
+            font-weight: 800;
             margin-bottom: 10px;
-            text-shadow: 
-                0 0 5px #cc0000,
-                0 0 10px #cc0000,
-                2px 2px 4px rgba(0,0,0,0.8);
             color: #ffffff;
-            text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: -0.5px;
         }
 
         .dashboard-card {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
-            border-radius: 8px;
+            background: white;
+            border-radius: 16px;
             padding: 30px;
-            box-shadow: 
-                0 10px 30px rgba(0,0,0,0.8),
-                inset 0 1px 0 rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border: 2px solid #333;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e1e5e9;
         }
 
         .stats-grid {
@@ -325,31 +288,26 @@ ORDERS_DASHBOARD_HTML = '''
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
-            color: #ffffff;
+            background: white;
+            color: #1a1a1a;
             padding: 20px;
-            border-radius: 8px;
+            border-radius: 12px;
             text-align: center;
-            border: 2px solid #333;
-            box-shadow: 
-                0 5px 15px rgba(0,0,0,0.8),
-                inset 0 1px 0 rgba(255,255,255,0.1);
+            border: 1px solid #e1e5e9;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
 
         .stat-number {
             font-size: 2.5rem;
-            font-weight: 900;
+            font-weight: 800;
             margin-bottom: 5px;
-            color: #cc0000;
-            text-shadow: 0 0 8px rgba(204, 0, 0, 0.5);
+            color: #667eea;
         }
 
         .stat-label {
             font-size: 1rem;
-            opacity: 0.9;
+            color: #666;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         .orders-table {
@@ -362,21 +320,18 @@ ORDERS_DASHBOARD_HTML = '''
         .orders-table td {
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #333;
-            color: #ffffff;
+            border-bottom: 1px solid #e1e5e9;
+            color: #1a1a1a;
         }
 
         .orders-table th {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            background: #f8f9fa;
             font-weight: 700;
-            color: #cc0000;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-shadow: 0 0 5px rgba(204, 0, 0, 0.3);
+            color: #1a1a1a;
         }
 
         .orders-table tr:hover {
-            background: linear-gradient(135deg, #2d2d2d 0%, #404040 100%);
+            background: #f8f9fa;
         }
 
         .status-badge {
@@ -410,16 +365,19 @@ ORDERS_DASHBOARD_HTML = '''
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
+            padding: 12px 20px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 0.9rem;
+            font-weight: 600;
             text-decoration: none;
             display: inline-block;
+            transition: all 0.3s ease;
         }
 
         .btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
 
         .empty-state {
@@ -435,6 +393,10 @@ ORDERS_DASHBOARD_HTML = '''
             
             .header h1 {
                 font-size: 2rem;
+            }
+            
+            .container {
+                padding: 0 16px;
             }
         }
     </style>
@@ -514,7 +476,8 @@ ORDER_DETAIL_HTML = '''
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Details - Music Store</title>
+    <title>Order Details - Metal Music Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -523,50 +486,63 @@ ORDER_DETAIL_HTML = '''
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 20px;
         }
 
+        /* Header */
         .header {
-            text-align: center;
-            margin-bottom: 30px;
+            background: #1a1a1a;
             color: white;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            margin-bottom: 40px;
+            text-align: center;
         }
 
         .header h1 {
             font-size: 2.5rem;
-            font-weight: 300;
+            font-weight: 800;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            color: #ffffff;
+            letter-spacing: -0.5px;
         }
 
         .order-card {
             background: white;
-            border-radius: 15px;
+            border-radius: 16px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e1e5e9;
         }
 
         .order-header {
-            background: #f8f9fa;
+            background: white;
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 30px;
             border-left: 4px solid #667eea;
+            border: 1px solid #e1e5e9;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
 
         .order-header h3 {
-            color: #667eea;
+            color: #1a1a1a;
             margin-bottom: 15px;
+            font-weight: 700;
         }
 
         .order-info {
@@ -602,11 +578,13 @@ ORDER_DETAIL_HTML = '''
         }
 
         .item {
-            background: #f8f9fa;
+            background: white;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 10px;
             border-left: 4px solid #667eea;
+            border: 1px solid #e1e5e9;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .item-header {
@@ -650,17 +628,20 @@ ORDER_DETAIL_HTML = '''
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
+            padding: 14px 20px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 1rem;
+            font-weight: 600;
             text-decoration: none;
             display: inline-block;
             margin-top: 20px;
+            transition: all 0.3s ease;
         }
 
         .btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
 
         @media (max-width: 768px) {
@@ -670,6 +651,10 @@ ORDER_DETAIL_HTML = '''
             
             .header h1 {
                 font-size: 2rem;
+            }
+            
+            .container {
+                padding: 0 16px;
             }
         }
     </style>

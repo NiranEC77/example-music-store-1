@@ -371,6 +371,7 @@ CART_HTML = '''
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping Cart - Metal Music Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -379,85 +380,52 @@ CART_HTML = '''
         }
 
         body {
-            font-family: 'Orbitron', 'Arial Black', sans-serif;
-            background: linear-gradient(135deg, #404040 0%, #555555 25%, #666666 50%, #555555 75%, #404040 100%);
-            min-height: 100vh;
-            color: #ffffff;
-            margin: 0;
-            padding: 0;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 20%, rgba(204, 0, 0, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(204, 0, 0, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 40% 60%, rgba(204, 0, 0, 0.03) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: -1;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 20px;
         }
 
+        /* Header */
         .header {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #ffffff;
-            position: relative;
+            background: #1a1a1a;
+            color: white;
             padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            margin-bottom: 40px;
         }
 
-        .header::before {
-            content: '🤘';
-            font-size: 2rem;
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .header::after {
-            content: '🤘';
-            font-size: 2rem;
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .header h1 {
-            font-size: 3rem;
-            font-weight: 900;
+            font-size: 2.5rem;
+            font-weight: 800;
             margin-bottom: 10px;
-            text-shadow: 
-                0 0 5px #cc0000,
-                0 0 10px #cc0000,
-                2px 2px 4px rgba(0,0,0,0.8);
             color: #ffffff;
-            text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: -0.5px;
         }
 
         .cart-card {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
-            border-radius: 8px;
+            background: white;
+            border-radius: 16px;
             padding: 30px;
-            box-shadow: 
-                0 10px 30px rgba(0,0,0,0.8),
-                inset 0 1px 0 rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border: 2px solid #333;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e1e5e9;
         }
 
         .cart-item {
@@ -466,7 +434,7 @@ CART_HTML = '''
             gap: 20px;
             align-items: center;
             padding: 20px;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid #e1e5e9;
             transition: all 0.3s ease;
         }
 
@@ -479,26 +447,24 @@ CART_HTML = '''
             height: 60px;
             object-fit: cover;
             border-radius: 8px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
         }
 
         .item-info h3 {
-            color: #ffffff;
+            color: #1a1a1a;
             margin-bottom: 5px;
             font-weight: 700;
-            text-shadow: 0 0 3px rgba(204, 0, 0, 0.3);
         }
 
         .item-info p {
-            color: #cccccc;
+            color: #666;
             font-size: 0.9rem;
-            font-weight: 600;
+            font-weight: 500;
         }
 
         .item-price {
-            font-weight: 900;
-            color: #cc0000;
-            text-shadow: 0 0 5px rgba(204, 0, 0, 0.3);
+            font-weight: 800;
+            color: #667eea;
         }
 
         .quantity-controls {
@@ -510,82 +476,66 @@ CART_HTML = '''
         .quantity-controls input {
             width: 60px;
             padding: 10px;
-            border: 2px solid #333;
-            border-radius: 6px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
             text-align: center;
-            background: #1a1a1a;
-            color: #ffffff;
-            font-weight: 600;
+            background: white;
+            color: #1a1a1a;
+            font-weight: 500;
             transition: all 0.3s ease;
         }
 
         .quantity-controls input:focus {
             outline: none;
-            border-color: #cc0000;
-            box-shadow: 0 0 10px rgba(204, 0, 0, 0.5);
+            border-color: #667eea;
         }
 
         .btn {
-            background: linear-gradient(135deg, #8b0000 0%, #660000 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border: 2px solid #333;
-            padding: 8px 16px;
-            border-radius: 6px;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 0.9rem;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
             transition: all 0.3s ease;
-            text-shadow: 0 0 3px rgba(255, 255, 255, 0.2);
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 
-                0 5px 15px rgba(0,0,0,0.6),
-                0 0 10px rgba(139, 0, 0, 0.3);
-            background: linear-gradient(135deg, #660000 0%, #8b0000 100%);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, #660000 0%, #4d0000 100%);
-            border-color: #4d0000;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
         }
 
         .btn-danger:hover {
-            background: linear-gradient(135deg, #4d0000 0%, #660000 100%);
-            border-color: #8b0000;
-            box-shadow: 0 0 15px rgba(102, 0, 0, 0.6);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.3);
         }
 
         .cart-total {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
-            border-radius: 8px;
+            background: white;
+            border-radius: 12px;
             padding: 25px;
             margin-top: 30px;
             text-align: right;
-            border-left: 4px solid #cc0000;
-            border: 2px solid #333;
-            box-shadow: 
-                0 5px 15px rgba(0,0,0,0.8),
-                inset 0 1px 0 rgba(255,255,255,0.1);
+            border-left: 4px solid #667eea;
+            border: 1px solid #e1e5e9;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
 
         .cart-total h3 {
-            color: #cc0000;
+            color: #1a1a1a;
             margin-bottom: 15px;
             font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-shadow: 0 0 5px rgba(204, 0, 0, 0.3);
         }
 
         .total-amount {
             font-size: 2.5rem;
-            font-weight: 900;
-            color: #cc0000;
-            text-shadow: 0 0 8px rgba(204, 0, 0, 0.5);
+            font-weight: 800;
+            color: #667eea;
         }
 
         .cart-actions {
@@ -597,13 +547,13 @@ CART_HTML = '''
         .empty-cart {
             text-align: center;
             padding: 60px 20px;
-            color: #cccccc;
+            color: #666;
         }
 
         .empty-cart p {
             font-size: 1.1rem;
             margin-bottom: 20px;
-            font-weight: 600;
+            font-weight: 500;
         }
 
         @media (max-width: 768px) {
@@ -616,13 +566,19 @@ CART_HTML = '''
             .header h1 {
                 font-size: 2rem;
             }
+            
+            .container {
+                padding: 0 16px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🛒 Shopping Cart</h1>
+            <div class="header-content">
+                <h1>🛒 Shopping Cart</h1>
+            </div>
             <p>Review your brutal metal collection</p>
         </div>
 
@@ -691,7 +647,8 @@ CHECKOUT_HTML = '''
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout - Music Store</title>
+    <title>Checkout - Metal Music Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -700,74 +657,64 @@ CHECKOUT_HTML = '''
         }
 
         body {
-            font-family: 'Orbitron', 'Arial Black', sans-serif;
-            background: linear-gradient(135deg, #404040 0%, #555555 25%, #666666 50%, #555555 75%, #404040 100%);
-            min-height: 100vh;
-            color: #ffffff;
-            margin: 0;
-            padding: 0;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 20% 80%, rgba(139, 0, 0, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(139, 0, 0, 0.1) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: -1;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 20px;
         }
 
+        /* Header */
         .header {
+            background: #1a1a1a;
+            color: white;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            margin-bottom: 40px;
             text-align: center;
-            margin-bottom: 30px;
-            color: #ffffff;
         }
 
         .header h1 {
             font-size: 2.5rem;
-            font-weight: 700;
+            font-weight: 800;
             margin-bottom: 10px;
-            text-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
-            background: linear-gradient(45deg, #ffffff, #cccccc);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #ffffff;
+            letter-spacing: -0.5px;
         }
 
         .checkout-card {
-            background: linear-gradient(135deg, #2d2d2d 0%, #404040 50%, #2d2d2d 100%);
-            border-radius: 15px;
+            background: white;
+            border-radius: 16px;
             padding: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            border: 2px solid #333;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e1e5e9;
         }
 
         .order-summary {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            background: white;
             border-radius: 12px;
             padding: 25px;
             margin-bottom: 30px;
-            border-left: 4px solid #8b0000;
-            border: 2px solid #333;
+            border-left: 4px solid #667eea;
+            border: 1px solid #e1e5e9;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
 
         .order-summary h3 {
-            color: #8b0000;
+            color: #1a1a1a;
             margin-bottom: 15px;
             font-size: 1.3rem;
-            text-shadow: 0 0 5px rgba(139, 0, 0, 0.3);
+            font-weight: 700;
         }
 
         .order-item {
@@ -776,8 +723,8 @@ CHECKOUT_HTML = '''
             align-items: center;
             margin-bottom: 10px;
             padding: 10px 0;
-            border-bottom: 1px solid #333;
-            color: #ffffff;
+            border-bottom: 1px solid #e1e5e9;
+            color: #1a1a1a;
         }
 
         .order-item:last-child {
@@ -785,15 +732,14 @@ CHECKOUT_HTML = '''
         }
 
         .order-total {
-            border-top: 2px solid #333;
+            border-top: 2px solid #e1e5e9;
             padding-top: 15px;
             margin-top: 15px;
             font-size: 1.2rem;
             font-weight: bold;
-            color: #8b0000;
+            color: #667eea;
             display: flex;
             justify-content: space-between;
-            text-shadow: 0 0 5px rgba(139, 0, 0, 0.3);
         }
 
         .form-section {
@@ -801,12 +747,12 @@ CHECKOUT_HTML = '''
         }
 
         .form-section h3 {
-            color: #8b0000;
+            color: #1a1a1a;
             margin-bottom: 20px;
             font-size: 1.3rem;
-            border-bottom: 2px solid #333;
+            border-bottom: 2px solid #e1e5e9;
             padding-bottom: 10px;
-            text-shadow: 0 0 5px rgba(139, 0, 0, 0.3);
+            font-weight: 700;
         }
 
         .form-row {
@@ -827,25 +773,24 @@ CHECKOUT_HTML = '''
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: #ffffff;
-            text-shadow: 0 0 3px rgba(139, 0, 0, 0.2);
+            color: #1a1a1a;
+            font-size: 0.9rem;
         }
 
         .form-group input, .form-group select {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #333;
-            border-radius: 6px;
+            padding: 14px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
             font-size: 1rem;
-            transition: border-color 0.2s;
-            background: #1a1a1a;
-            color: #ffffff;
+            transition: border-color 0.3s ease;
+            background: white;
+            color: #1a1a1a;
         }
 
         .form-group input:focus, .form-group select:focus {
             outline: none;
-            border-color: #8b0000;
-            box-shadow: 0 0 10px rgba(139, 0, 0, 0.3);
+            border-color: #667eea;
         }
 
         .card-row {
@@ -870,16 +815,17 @@ CHECKOUT_HTML = '''
             color: white;
             border: none;
             padding: 15px 30px;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 1rem;
-            font-weight: 500;
-            transition: transform 0.2s;
+            font-weight: 600;
+            transition: all 0.3s ease;
             width: 100%;
         }
 
         .btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
 
         .btn:disabled {
@@ -892,7 +838,7 @@ CHECKOUT_HTML = '''
             background: #f8d7da;
             color: #721c24;
             padding: 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             margin-bottom: 20px;
             border: 1px solid #f5c6cb;
         }
@@ -903,9 +849,9 @@ CHECKOUT_HTML = '''
         }
 
         .back-link a {
-            color: white;
+            color: #667eea;
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .back-link a:hover {
@@ -1234,7 +1180,8 @@ SUCCESS_HTML = '''
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Successful - Music Store</title>
+    <title>Order Successful - Metal Music Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -1243,92 +1190,79 @@ SUCCESS_HTML = '''
         }
 
         body {
-            font-family: 'Orbitron', 'Arial Black', sans-serif;
-            background: linear-gradient(135deg, #404040 0%, #555555 25%, #666666 50%, #555555 75%, #404040 100%);
-            min-height: 100vh;
-            color: #ffffff;
-            margin: 0;
-            padding: 0;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 20% 80%, rgba(139, 0, 0, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(139, 0, 0, 0.1) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: -1;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 20px;
         }
 
+        /* Header */
         .header {
+            background: #1a1a1a;
+            color: white;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+            margin-bottom: 40px;
             text-align: center;
-            margin-bottom: 30px;
-            color: #ffffff;
         }
 
         .header h1 {
             font-size: 2.5rem;
-            font-weight: 700;
+            font-weight: 800;
             margin-bottom: 10px;
-            text-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
-            background: linear-gradient(45deg, #ffffff, #cccccc);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #ffffff;
+            letter-spacing: -0.5px;
         }
 
         .success-card {
-            background: linear-gradient(135deg, #2d2d2d 0%, #404040 50%, #2d2d2d 100%);
-            border-radius: 15px;
+            background: white;
+            border-radius: 16px;
             padding: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            border: 2px solid #333;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e1e5e9;
             text-align: center;
         }
 
         .success-icon {
             font-size: 4rem;
             margin-bottom: 20px;
-            color: #8b0000;
-            text-shadow: 0 0 15px rgba(139, 0, 0, 0.5);
+            color: #667eea;
         }
 
         .success-title {
-            color: #8b0000;
+            color: #1a1a1a;
             font-size: 2rem;
             margin-bottom: 15px;
             font-weight: 700;
-            text-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
         }
 
         .success-message {
-            color: #ffffff;
+            color: #666;
             font-size: 1.1rem;
             margin-bottom: 30px;
             line-height: 1.6;
-            text-shadow: 0 0 5px rgba(139, 0, 0, 0.2);
         }
 
         .order-summary {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            background: white;
             border-radius: 12px;
             padding: 25px;
             margin: 20px 0;
             border-left: 4px solid #28a745;
             text-align: left;
-            border: 2px solid #333;
+            border: 1px solid #e1e5e9;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
 
         .order-summary h4 {
@@ -1336,21 +1270,22 @@ SUCCESS_HTML = '''
             margin-bottom: 15px;
             font-size: 1.3rem;
             text-align: center;
+            font-weight: 700;
         }
 
         .order-info {
-            color: #ffffff;
+            color: #1a1a1a;
             font-size: 1rem;
             line-height: 1.6;
             text-align: center;
         }
 
         .btn {
-            background: linear-gradient(135deg, #8b0000 0%, #660000 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border: 2px solid #333;
+            border: none;
             padding: 15px 30px;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 1rem;
             font-weight: 600;
@@ -1358,43 +1293,40 @@ SUCCESS_HTML = '''
             text-decoration: none;
             display: inline-block;
             margin: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            text-shadow: 0 0 3px rgba(255, 255, 255, 0.2);
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.6);
-            background: linear-gradient(135deg, #660000 0%, #8b0000 100%);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, #404040 0%, #333333 100%);
-            border-color: #555;
+            background: #f8f9fa;
+            color: #666;
+            border: 1px solid #e1e5e9;
         }
 
         .btn-secondary:hover {
-            background: linear-gradient(135deg, #333333 0%, #404040 100%);
-            border-color: #666;
+            background: #e9ecef;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🤘 WOOHOO! PURCHASE COMPLETE!</h1>
-            <p>You've got your brutal metal albums!</p>
+            <h1>🤘 Purchase Complete!</h1>
+            <p>Your brutal metal albums are on the way!</p>
         </div>
 
         <div class="success-card">
-            <div class="success-icon">🔥</div>
-            <h1 class="success-title">TRANSACTION SUCCESSFUL!</h1>
+            <div class="success-icon">🎉</div>
+            <h1 class="success-title">Transaction Successful!</h1>
             <p class="success-message">
-                🤘 WOOHOO! Your brutal metal albums have been purchased successfully! 
+                🤘 Your brutal metal albums have been purchased successfully! 
                 <br>Your collection is on its way to your lair!
                 <br>You'll receive a confirmation email with tracking information.
-                <br><strong>ROCK ON! 🤘</strong>
+                <br><strong>Rock on! 🤘</strong>
             </p>
             
             <div class="order-summary">
@@ -1404,7 +1336,7 @@ SUCCESS_HTML = '''
                     <p>✅ Payment has been confirmed</p>
                     <p>✅ Your albums will be shipped within 2-3 business days</p>
                     <p>✅ You'll receive tracking information via email</p>
-                    <p style="margin-top: 20px; font-weight: bold; color: #8b0000;">
+                    <p style="margin-top: 20px; font-weight: bold; color: #667eea;">
                         Thank you for supporting brutal metal! 🤘
                     </p>
                 </div>
