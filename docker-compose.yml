@@ -25,6 +25,7 @@ services:
     environment:
       - CART_SERVICE_URL=http://cart-service:5002
       - ORDER_SERVICE_URL=http://order-service:5001
+      - USERS_SERVICE_URL=http://users-service:5003
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_NAME=music_store
@@ -38,6 +39,8 @@ services:
       cart-service:
         condition: service_started
       order-service:
+        condition: service_started
+      users-service:
         condition: service_started
 
   cart-service:
@@ -62,7 +65,17 @@ services:
     volumes:
       - order-data:/app
 
+  users-service:
+    build: ./users-service
+    ports:
+      - "5003:5003"
+    environment:
+      - USERS_DB_PATH=/app/users.db
+    volumes:
+      - users-data:/app
+
 volumes:
   postgres_data:
   cart-data:
-  order-data: 
+  order-data:
+  users-data: 

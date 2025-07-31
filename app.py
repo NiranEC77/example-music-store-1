@@ -11,6 +11,7 @@ app.secret_key = 'your-secret-key-here'  # Required for sessions
 # Configuration
 CART_SERVICE_URL = os.environ.get('CART_SERVICE_URL', 'http://localhost:5002')
 ORDER_SERVICE_URL = os.environ.get('ORDER_SERVICE_URL', 'http://localhost:5001')
+USERS_SERVICE_URL = os.environ.get('USERS_SERVICE_URL', 'http://localhost:5003')
 
 # Database configuration
 DB_HOST = os.environ.get('DB_HOST', 'localhost')
@@ -124,6 +125,116 @@ INDEX_HTML = '''
             color: #ffffff;
             position: relative;
             padding: 20px 0;
+        }
+
+        .admin-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #8b0000 0%, #660000 100%);
+            color: white;
+            border: 2px solid #333;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-shadow: 0 0 3px rgba(255, 255, 255, 0.2);
+        }
+
+        .admin-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 5px 15px rgba(0,0,0,0.6),
+                0 0 10px rgba(139, 0, 0, 0.3);
+            background: linear-gradient(135deg, #660000 0%, #8b0000 100%);
+        }
+
+        .login-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .login-content {
+            background: linear-gradient(135deg, #2d2d2d 0%, #404040 50%, #2d2d2d 100%);
+            margin: 15% auto;
+            padding: 30px;
+            border: 2px solid #333;
+            border-radius: 15px;
+            width: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            color: #ffffff;
+        }
+
+        .login-content h2 {
+            color: #8b0000;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 5px rgba(139, 0, 0, 0.3);
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #333;
+            border-radius: 6px;
+            background: #1a1a1a;
+            color: #ffffff;
+            font-size: 1rem;
+        }
+
+        .login-form input:focus {
+            outline: none;
+            border-color: #8b0000;
+            box-shadow: 0 0 10px rgba(139, 0, 0, 0.3);
+        }
+
+        .login-form button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #8b0000 0%, #660000 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .login-form button:hover {
+            background: linear-gradient(135deg, #660000 0%, #8b0000 100%);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #8b0000;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            text-align: center;
+            margin: 10px 0;
+            display: none;
         }
 
         .header::before {
@@ -605,13 +716,13 @@ INDEX_HTML = '''
 <body>
     <div class="container">
         <div class="header">
-                            <h1><a href="/" style="text-decoration: none; color: inherit;">🤘 Metal Music Store</a></h1>
-                            <p>Discover and collect the most brutal metal albums</p>
+            <h1><a href="/" style="text-decoration: none; color: inherit;">🤘 Metal Music Store</a></h1>
+            <p>Discover and collect the most brutal metal albums</p>
+            <button class="admin-button" onclick="showLoginModal()">⚙️ Store Administration</button>
         </div>
 
         <div class="tabs">
             <button class="tab active" onclick="showTab('shop')">🛍️ Shop</button>
-            <button class="tab" onclick="showTab('admin')">⚙️ Admin</button>
             <a href="/cart" class="tab cart-tab">🛒 Cart</a>
         </div>
 
@@ -621,125 +732,49 @@ INDEX_HTML = '''
                 <h2 class="section-title">📀 Available Albums</h2>
                 {% if albums %}
                 <div class="album-grid">
-                                            {% for a in albums %}
-                        <div class="album-card">
-                            {% if a.cover_url %}
-                            <img src="{{a.cover_url}}" alt="Album cover" class="album-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="album-cover" style="display: none;">{{a.name}}</div>
-                            {% else %}
-                            <div class="album-cover">{{a.name}}</div>
-                            {% endif %}
-                            <div class="album-info">
-                                <h3>{{a.name}}</h3>
-                                <p>by {{a.artist}}</p>
-                                <div class="album-price">${{"%.2f"|format(a.price)}}</div>
-                                <div class="album-actions">
-                                    <form action="/add_to_cart" method="post" class="order-form" onsubmit="return addToCart(event, this)">
-                                        <input type="hidden" name="album_id" value="{{a.id}}">
-                                        <input type="number" name="quantity" value="1" min="1" placeholder="Qty">
-                                        <button type="submit" class="btn">Add to Cart</button>
-                                    </form>
-                                </div>
+                    {% for a in albums %}
+                    <div class="album-card">
+                        {% if a.cover_url %}
+                        <img src="{{a.cover_url}}" alt="Album cover" class="album-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="album-cover" style="display: none;">{{a.name}}</div>
+                        {% else %}
+                        <div class="album-cover">{{a.name}}</div>
+                        {% endif %}
+                        <div class="album-info">
+                            <h3>{{a.name}}</h3>
+                            <p>by {{a.artist}}</p>
+                            <div class="album-price">${{"%.2f"|format(a.price)}}</div>
+                            <div class="album-actions">
+                                <form action="/add_to_cart" method="post" class="order-form" onsubmit="return addToCart(event, this)">
+                                    <input type="hidden" name="album_id" value="{{a.id}}">
+                                    <input type="number" name="quantity" value="1" min="1" placeholder="Qty">
+                                    <button type="submit" class="btn">Add to Cart</button>
+                                </form>
                             </div>
                         </div>
-                        {% endfor %}
+                    </div>
+                    {% endfor %}
                 </div>
                 {% else %}
                 <div class="empty-state">
                     <p>No albums available yet.</p>
-                    <p>Switch to Admin tab to add some albums!</p>
+                    <p>Contact the store administrator to add some albums!</p>
                 </div>
                 {% endif %}
             </div>
+        </div>
 
-            <!-- Admin Tab -->
-            <div id="admin" class="content-section">
-                <h2 class="section-title">⚙️ Store Management</h2>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number">{{albums|length}}</div>
-                        <div class="stat-label">Total Albums</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">{{orders|length}}</div>
-                        <div class="stat-label">Total Orders</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">${{"%.2f"|format(orders|sum(attribute='price') * orders|sum(attribute='quantity')) if orders else 0}}</div>
-                        <div class="stat-label">Total Revenue</div>
-                    </div>
-                </div>
-
-                <div class="form-grid">
-                    <div>
-                        <h3 style="color: #667eea; margin-bottom: 20px;">➕ Add New Album</h3>
-                        <form action="/add" method="post" enctype="multipart/form-data">
-                            <div class="form-group">
-                                <label for="name">Album Name</label>
-                                <input type="text" id="name" name="name" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="artist">Artist</label>
-                                <input type="text" id="artist" name="artist" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="price">Price ($)</label>
-                                <input type="number" id="price" name="price" step="0.01" min="0" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="cover_file">Cover Image (File)</label>
-                                <input type="file" id="cover_file" name="cover_file" accept="image/*">
-                            </div>
-                            <div class="form-group">
-                                <label for="cover_url">Cover Image (URL)</label>
-                                <input type="url" id="cover_url" name="cover_url" placeholder="https://example.com/image.jpg">
-                            </div>
-                            <button type="submit" class="btn" style="width: 100%; padding: 15px;">Add Album</button>
-                        </form>
-                    </div>
-
-                    <div>
-                        <h3 style="color: #667eea; margin-bottom: 20px;">🛒 Recent Orders</h3>
-                        {% if orders %}
-                        <ul class="orders-list">
-                                                    {% for o in orders %}
-                        <li class="order-item">
-                            {{o.quantity}}x <strong>{{o.name}}</strong> by {{o.artist}} <span style="color: #667eea;">(${{"%.2f"|format(o.price)}} each)</span>
-                        </li>
-                        {% endfor %}
-                        </ul>
-                        {% else %}
-                        <div class="empty-state">
-                            <p>No orders yet.</p>
-                            <p>Start shopping to see orders here!</p>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div style="margin-top: 40px;">
-                    <h3 style="color: #667eea; margin-bottom: 20px;">🗑️ Manage Albums</h3>
-                    {% if albums %}
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
-                        {% for a in albums %}
-                        <div style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%); border: 2px solid #333; border-radius: 8px; padding: 20px;">
-                            <h4 style="color: #ffffff; margin-bottom: 10px;">{{a.name}}</h4>
-                            <p style="color: #cccccc; margin-bottom: 15px;">by {{a.artist}}</p>
-                            <p style="color: #8b0000; font-weight: bold; margin-bottom: 15px;">${{"%.2f"|format(a.price)}}</p>
-                            <form action="/delete/{{a.id}}" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete {{a.name}}?')">
-                                <button type="submit" class="btn btn-danger" style="width: 100%;">Delete Album</button>
-                            </form>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <div class="empty-state">
-                        <p>No albums to manage.</p>
-                    </div>
-                    {% endif %}
-                </div>
-                </div>
+        <!-- Login Modal -->
+        <div id="loginModal" class="login-modal">
+            <div class="login-content">
+                <span class="close" onclick="closeLoginModal()">&times;</span>
+                <h2>🔐 Store Administration Login</h2>
+                <div class="error-message" id="loginError"></div>
+                <form class="login-form" onsubmit="return handleLogin(event)">
+                    <input type="text" id="username" name="username" placeholder="Username" required>
+                    <input type="password" id="password" name="password" placeholder="Password" required>
+                    <button type="submit">Login</button>
+                </form>
             </div>
         </div>
     </div>
@@ -763,6 +798,68 @@ INDEX_HTML = '''
             
             // Add active class to clicked tab
             event.target.classList.add('active');
+        }
+
+        function showLoginModal() {
+            document.getElementById('loginModal').style.display = 'block';
+            document.getElementById('username').focus();
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            // Call login API
+            fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Store token in localStorage
+                    localStorage.setItem('adminToken', data.token);
+                    localStorage.setItem('adminUser', JSON.stringify(data.user));
+                    
+                    // Close modal and redirect to admin page
+                    closeLoginModal();
+                    window.location.href = '/admin';
+                } else {
+                    errorDiv.textContent = data.error || 'Login failed';
+                    errorDiv.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                errorDiv.textContent = 'Login failed. Please try again.';
+                errorDiv.style.display = 'block';
+            });
+            
+            return false;
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('loginModal');
+            if (event.target == modal) {
+                closeLoginModal();
+            }
         }
 
         function addToCart(event, form) {
@@ -824,6 +921,422 @@ INDEX_HTML = '''
                 }, 300);
             }, 10000);
         }
+    </script>
+</body>
+</html>
+'''
+
+# Admin HTML Template
+ADMIN_HTML = '''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Administration - Metal Music Store</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', 'Arial Black', sans-serif;
+            background: linear-gradient(135deg, #404040 0%, #555555 25%, #666666 50%, #555555 75%, #404040 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(255, 0, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 0, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(255, 0, 0, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #ffffff;
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .header h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            text-shadow: 
+                0 0 5px #cc0000,
+                0 0 10px #cc0000,
+                2px 2px 4px rgba(0,0,0,0.8);
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .header p {
+            font-size: 1.4rem;
+            opacity: 0.9;
+            text-shadow: 0 0 5px rgba(204, 0, 0, 0.3);
+            font-weight: 600;
+        }
+
+        .admin-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #8b0000 0%, #660000 100%);
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: 2px solid #333;
+            font-size: 0.9rem;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, #404040 0%, #333333 100%);
+            color: white;
+            border: 2px solid #333;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-shadow: 0 0 3px rgba(255, 255, 255, 0.2);
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+            background: linear-gradient(135deg, #333333 0%, #404040 100%);
+        }
+
+        .section-title {
+            color: #cc0000;
+            margin-bottom: 25px;
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 
+                0 0 5px #cc0000,
+                2px 2px 4px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        .section-title::before {
+            content: '⚡';
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            color: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #333;
+            box-shadow: 
+                0 5px 15px rgba(0,0,0,0.8),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            color: #cc0000;
+            text-shadow: 0 0 8px rgba(204, 0, 0, 0.5);
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #ffffff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            text-shadow: 0 0 3px rgba(204, 0, 0, 0.2);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #333;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #cc0000;
+            box-shadow: 0 0 10px rgba(204, 0, 0, 0.3);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #8b0000 0%, #660000 100%);
+            color: white;
+            border: 2px solid #333;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 3px rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 5px 15px rgba(0,0,0,0.6),
+                0 0 10px rgba(139, 0, 0, 0.3);
+            background: linear-gradient(135deg, #660000 0%, #8b0000 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #660000 0%, #4d0000 100%);
+            border-color: #4d0000;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #4d0000 0%, #660000 100%);
+            border-color: #8b0000;
+            box-shadow: 0 0 15px rgba(102, 0, 0, 0.6);
+        }
+
+        .orders-list {
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .order-item {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #cc0000;
+            border: 2px solid #333;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #cccccc;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/" class="back-button">← Back to Store</a>
+            <div class="admin-info">
+                Logged in as: {{user.username}}
+            </div>
+            <h1>⚙️ Store Administration</h1>
+            <p>Manage your brutal metal collection</p>
+        </div>
+
+        <h2 class="section-title">📊 Store Statistics</h2>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{albums|length}}</div>
+                <div class="stat-label">Total Albums</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{orders|length}}</div>
+                <div class="stat-label">Total Orders</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">${{"%.2f"|format(orders|sum(attribute='price') * orders|sum(attribute='quantity')) if orders else 0}}</div>
+                <div class="stat-label">Total Revenue</div>
+            </div>
+        </div>
+
+        <div class="form-grid">
+            <div>
+                <h3 style="color: #cc0000; margin-bottom: 20px;">➕ Add New Album</h3>
+                <form action="/add" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="name">Album Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="artist">Artist</label>
+                        <input type="text" id="artist" name="artist" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price ($)</label>
+                        <input type="number" id="price" name="price" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cover_file">Cover Image (File)</label>
+                        <input type="file" id="cover_file" name="cover_file" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="cover_url">Cover Image (URL)</label>
+                        <input type="url" id="cover_url" name="cover_url" placeholder="https://example.com/image.jpg">
+                    </div>
+                    <button type="submit" class="btn" style="width: 100%; padding: 15px;">Add Album</button>
+                </form>
+            </div>
+
+            <div>
+                <h3 style="color: #cc0000; margin-bottom: 20px;">🛒 Recent Orders</h3>
+                {% if orders %}
+                <ul class="orders-list">
+                    {% for o in orders %}
+                    <li class="order-item">
+                        {{o.quantity}}x <strong>{{o.name}}</strong> by {{o.artist}} <span style="color: #cc0000;">(${{"%.2f"|format(o.price)}} each)</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="empty-state">
+                    <p>No orders yet.</p>
+                    <p>Start shopping to see orders here!</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="margin-top: 40px;">
+            <h3 style="color: #cc0000; margin-bottom: 20px;">🗑️ Manage Albums</h3>
+            {% if albums %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+                {% for a in albums %}
+                <div style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%); border: 2px solid #333; border-radius: 8px; padding: 20px;">
+                    <h4 style="color: #ffffff; margin-bottom: 10px;">{{a.name}}</h4>
+                    <p style="color: #cccccc; margin-bottom: 15px;">by {{a.artist}}</p>
+                    <p style="color: #cc0000; font-weight: bold; margin-bottom: 15px;">${{"%.2f"|format(a.price)}}</p>
+                    <form action="/delete/{{a.id}}" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete {{a.name}}?')">
+                        <button type="submit" class="btn btn-danger" style="width: 100%;">Delete Album</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>No albums to manage.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Check if user is still authenticated
+        function checkAuth() {
+            const token = localStorage.getItem('adminToken');
+            if (!token) {
+                window.location.href = '/';
+                return;
+            }
+
+            fetch('/api/verify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token: token })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.valid || data.user.role !== 'admin') {
+                    localStorage.removeItem('adminToken');
+                    localStorage.removeItem('adminUser');
+                    window.location.href = '/';
+                }
+            })
+            .catch(error => {
+                console.error('Auth check failed:', error);
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminUser');
+                window.location.href = '/';
+            });
+        }
+
+        // Check auth every 5 minutes
+        setInterval(checkAuth, 300000);
+        
+        // Check auth on page load
+        checkAuth();
     </script>
 </body>
 </html>
@@ -1078,6 +1591,75 @@ def order_success():
         return response.content, response.status_code
     except requests.RequestException as e:
         return f"Error connecting to cart service: {str(e)}", 503
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    """Forward login request to users service"""
+    import requests
+    
+    try:
+        response = requests.post(f"{USERS_SERVICE_URL}/api/login", json=request.get_json())
+        return response.content, response.status_code
+    except requests.RequestException as e:
+        return jsonify({'error': f'Users service unavailable: {str(e)}'}), 503
+
+@app.route('/api/logout', methods=['POST'])
+def logout():
+    """Forward logout request to users service"""
+    import requests
+    
+    try:
+        response = requests.post(f"{USERS_SERVICE_URL}/api/logout", json=request.get_json())
+        return response.content, response.status_code
+    except requests.RequestException as e:
+        return jsonify({'error': f'Users service unavailable: {str(e)}'}), 503
+
+@app.route('/api/verify', methods=['POST'])
+def verify_token():
+    """Forward token verification to users service"""
+    import requests
+    
+    try:
+        response = requests.post(f"{USERS_SERVICE_URL}/api/verify", json=request.get_json())
+        return response.content, response.status_code
+    except requests.RequestException as e:
+        return jsonify({'error': f'Users service unavailable: {str(e)}'}), 503
+
+@app.route('/admin')
+def admin_panel():
+    """Admin panel - requires authentication"""
+    import requests
+    
+    # Get token from request headers or query params
+    token = request.headers.get('Authorization', '').replace('Bearer ', '') or request.args.get('token')
+    
+    if not token:
+        return redirect(url_for('index'))
+    
+    try:
+        # Verify token with users service
+        response = requests.post(f"{USERS_SERVICE_URL}/api/verify", json={'token': token})
+        if response.status_code != 200:
+            return redirect(url_for('index'))
+        
+        user_data = response.json()
+        if user_data.get('user', {}).get('role') != 'admin':
+            return redirect(url_for('index'))
+        
+        # Get albums and orders for admin panel
+        with get_db_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                cur.execute('SELECT * FROM albums ORDER BY created_at DESC')
+                albums = cur.fetchall()
+                cur.execute('''SELECT orders.id, albums.name, albums.artist, orders.quantity, albums.price 
+                              FROM orders JOIN albums ON orders.album_id = albums.id 
+                              ORDER BY orders.created_at DESC''')
+                orders = cur.fetchall()
+        
+        return render_template_string(ADMIN_HTML, albums=albums, orders=orders, user=user_data['user'])
+        
+    except requests.RequestException as e:
+        return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000) 
