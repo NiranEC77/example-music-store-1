@@ -41,7 +41,7 @@ spec:
     spec:
       containers:
       - name: postgres
-        image: ghcr.io/niranec77/example-music-store-1-database:1.0.13
+        image: ghcr.io/niranec77/example-music-store-1-database:1.0.14
         ports:
         - containerPort: 5432
         env:
@@ -54,7 +54,7 @@ spec:
         - name: PGDATA
           value: "/var/lib/postgresql/data/pgdata"
         - name: DB_VERSION
-          value: "1.0.13"
+          value: "1.0.14"
         volumeMounts:
         - name: postgres-storage
           mountPath: /var/lib/postgresql/data
@@ -89,13 +89,13 @@ data:
         SELECT version INTO current_version FROM db_version WHERE id = 1;
         
         -- If version is different or doesn't exist, reinitialize
-        IF current_version IS NULL OR current_version != '1.0.13' THEN
+        IF current_version IS NULL OR current_version != '1.0.14' THEN
             -- Drop existing tables
             DROP TABLE IF EXISTS albums CASCADE;
             
             -- Update version
             DELETE FROM db_version WHERE id = 1;
-            INSERT INTO db_version (id, version) VALUES (1, '1.0.13');
+            INSERT INTO db_version (id, version) VALUES (1, '1.0.14');
         END IF;
     END $$;
 

@@ -37,6 +37,17 @@ def allowed_file(filename):
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+@app.route('/test-static')
+def test_static():
+    """Test static file serving"""
+    return '''
+    <h1>Static File Test</h1>
+    <p>Testing album covers:</p>
+    <img src="/static/covers/Pantera-VulgarDisplayofPower.jpg" alt="Pantera" style="width: 200px;">
+    <img src="/static/covers/Metallica_-_...And_Justice_for_All_cover.jpg" alt="Metallica" style="width: 200px;">
+    <img src="/static/covers/Sound_garden-Superunknown.jpg" alt="Soundgarden" style="width: 200px;">
+    '''
+
 # Main HTML Template
 INDEX_HTML = '''
 <!DOCTYPE html>
