@@ -88,7 +88,7 @@ INDEX_HTML = '''
 
         body {
             font-family: 'Orbitron', 'Arial Black', sans-serif;
-            background: linear-gradient(135deg, #2d2d2d 0%, #404040 25%, #555555 50%, #404040 75%, #2d2d2d 100%);
+            background: linear-gradient(135deg, #404040 0%, #555555 25%, #666666 50%, #555555 75%, #404040 100%);
             min-height: 100vh;
             color: #ffffff;
             margin: 0;
@@ -874,6 +874,49 @@ def process_payment():
     
     try:
         response = requests.post(f"{CART_SERVICE_URL}/process_payment", data=request.form)
+        return response.content, response.status_code
+    except requests.RequestException as e:
+        return f"Error connecting to cart service: {str(e)}", 503
+
+@app.route('/remove_item', methods=['POST'])
+def remove_item():
+    """Forward remove item request to cart service"""
+    import requests
+    
+    try:
+        # Get session_id from our session
+        session_id = session.get('cart_session_id')
+        if not session_id:
+            return redirect(url_for('view_cart'))
+        
+        # Forward the request with session_id
+        cart_data = {
+            'item_id': request.form['item_id'],
+            'session_id': session_id
+        }
+        response = requests.post(f"{CART_SERVICE_URL}/remove_item", data=cart_data)
+        return response.content, response.status_code
+    except requests.RequestException as e:
+        return f"Error connecting to cart service: {str(e)}", 503
+
+@app.route('/update_quantity', methods=['POST'])
+def update_quantity():
+    """Forward update quantity request to cart service"""
+    import requests
+    
+    try:
+        # Get session_id from our session
+        session_id = session.get('cart_session_id')
+        if not session_id:
+            return redirect(url_for('view_cart'))
+        
+        # Forward the request with session_id
+        cart_data = {
+            'item_id': request.form['item_id'],
+            'quantity': request.form['quantity'],
+            'session_id': session_id
+        }
+        response = requests.post(f"{CART_SERVICE_URL}/update_quantity", data=cart_data)
         return response.content, response.status_code
     except requests.RequestException as e:
         return f"Error connecting to cart service: {str(e)}", 503

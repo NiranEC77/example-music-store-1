@@ -237,7 +237,7 @@ ORDERS_DASHBOARD_HTML = '''
 
         body {
             font-family: 'Orbitron', 'Arial Black', sans-serif;
-            background: linear-gradient(135deg, #2d2d2d 0%, #404040 25%, #555555 50%, #404040 75%, #2d2d2d 100%);
+            background: linear-gradient(135deg, #404040 0%, #555555 25%, #666666 50%, #555555 75%, #404040 100%);
             min-height: 100vh;
             color: #ffffff;
             margin: 0;

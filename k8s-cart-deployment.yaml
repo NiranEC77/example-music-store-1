@@ -39,7 +39,7 @@ spec:
       labels:
         app: cart-service
       annotations:
-        kubernetes.io/change-cause: "Updated styling - brighter background"
+        kubernetes.io/change-cause: "Fixed cart session management, metal checkout theme, cool success message"
     spec:
       containers:
       - name: cart-service

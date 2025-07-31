@@ -347,7 +347,7 @@ CART_HTML = '''
 
         body {
             font-family: 'Orbitron', 'Arial Black', sans-serif;
-            background: linear-gradient(135deg, #2d2d2d 0%, #404040 25%, #555555 50%, #404040 75%, #2d2d2d 100%);
+            background: linear-gradient(135deg, #404040 0%, #555555 25%, #666666 50%, #555555 75%, #404040 100%);
             min-height: 100vh;
             color: #ffffff;
             margin: 0;
@@ -667,10 +667,27 @@ CHECKOUT_HTML = '''
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Orbitron', 'Arial Black', sans-serif;
+            background: linear-gradient(135deg, #404040 0%, #555555 25%, #666666 50%, #555555 75%, #404040 100%);
             min-height: 100vh;
-            color: #333;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 80%, rgba(139, 0, 0, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(139, 0, 0, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
         }
 
         .container {
@@ -682,36 +699,42 @@ CHECKOUT_HTML = '''
         .header {
             text-align: center;
             margin-bottom: 30px;
-            color: white;
+            color: #ffffff;
         }
 
         .header h1 {
             font-size: 2.5rem;
-            font-weight: 300;
+            font-weight: 700;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
+            background: linear-gradient(45deg, #ffffff, #cccccc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .checkout-card {
-            background: white;
+            background: linear-gradient(135deg, #2d2d2d 0%, #404040 50%, #2d2d2d 100%);
             border-radius: 15px;
             padding: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border: 2px solid #333;
         }
 
         .order-summary {
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
             border-radius: 12px;
             padding: 25px;
             margin-bottom: 30px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #8b0000;
+            border: 2px solid #333;
         }
 
         .order-summary h3 {
-            color: #667eea;
+            color: #8b0000;
             margin-bottom: 15px;
             font-size: 1.3rem;
+            text-shadow: 0 0 5px rgba(139, 0, 0, 0.3);
         }
 
         .order-item {
@@ -720,7 +743,8 @@ CHECKOUT_HTML = '''
             align-items: center;
             margin-bottom: 10px;
             padding: 10px 0;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid #333;
+            color: #ffffff;
         }
 
         .order-item:last-child {
@@ -728,14 +752,15 @@ CHECKOUT_HTML = '''
         }
 
         .order-total {
-            border-top: 2px solid #e9ecef;
+            border-top: 2px solid #333;
             padding-top: 15px;
             margin-top: 15px;
             font-size: 1.2rem;
             font-weight: bold;
-            color: #667eea;
+            color: #8b0000;
             display: flex;
             justify-content: space-between;
+            text-shadow: 0 0 5px rgba(139, 0, 0, 0.3);
         }
 
         .form-section {
@@ -743,11 +768,12 @@ CHECKOUT_HTML = '''
         }
 
         .form-section h3 {
-            color: #667eea;
+            color: #8b0000;
             margin-bottom: 20px;
             font-size: 1.3rem;
-            border-bottom: 2px solid #e9ecef;
+            border-bottom: 2px solid #333;
             padding-bottom: 10px;
+            text-shadow: 0 0 5px rgba(139, 0, 0, 0.3);
         }
 
         .form-row {
@@ -767,22 +793,26 @@ CHECKOUT_HTML = '''
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 500;
-            color: #555;
+            font-weight: 600;
+            color: #ffffff;
+            text-shadow: 0 0 3px rgba(139, 0, 0, 0.2);
         }
 
         .form-group input, .form-group select {
             width: 100%;
             padding: 12px;
-            border: 2px solid #e9ecef;
+            border: 2px solid #333;
             border-radius: 6px;
             font-size: 1rem;
             transition: border-color 0.2s;
+            background: #1a1a1a;
+            color: #ffffff;
         }
 
         .form-group input:focus, .form-group select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #8b0000;
+            box-shadow: 0 0 10px rgba(139, 0, 0, 0.3);
         }
 
         .card-row {
@@ -1180,10 +1210,27 @@ SUCCESS_HTML = '''
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Orbitron', 'Arial Black', sans-serif;
+            background: linear-gradient(135deg, #404040 0%, #555555 25%, #666666 50%, #555555 75%, #404040 100%);
             min-height: 100vh;
-            color: #333;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 80%, rgba(139, 0, 0, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(139, 0, 0, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
         }
 
         .container {
@@ -1195,42 +1242,50 @@ SUCCESS_HTML = '''
         .header {
             text-align: center;
             margin-bottom: 30px;
-            color: white;
+            color: #ffffff;
         }
 
         .header h1 {
             font-size: 2.5rem;
-            font-weight: 300;
+            font-weight: 700;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
+            background: linear-gradient(45deg, #ffffff, #cccccc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .success-card {
-            background: white;
+            background: linear-gradient(135deg, #2d2d2d 0%, #404040 50%, #2d2d2d 100%);
             border-radius: 15px;
             padding: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border: 2px solid #333;
             text-align: center;
         }
 
         .success-icon {
             font-size: 4rem;
             margin-bottom: 20px;
+            color: #8b0000;
+            text-shadow: 0 0 15px rgba(139, 0, 0, 0.5);
         }
 
         .success-title {
-            color: #28a745;
+            color: #8b0000;
             font-size: 2rem;
             margin-bottom: 15px;
-            font-weight: 600;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
         }
 
         .success-message {
-            color: #666;
+            color: #ffffff;
             font-size: 1.1rem;
             margin-bottom: 30px;
             line-height: 1.6;
+            text-shadow: 0 0 5px rgba(139, 0, 0, 0.2);
         }
 
         .order-details {
@@ -1301,46 +1356,55 @@ SUCCESS_HTML = '''
         }
 
         .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #8b0000 0%, #660000 100%);
             color: white;
-            border: none;
+            border: 2px solid #333;
             padding: 15px 30px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 1rem;
-            font-weight: 500;
-            transition: transform 0.2s;
+            font-weight: 600;
+            transition: all 0.3s ease;
             text-decoration: none;
             display: inline-block;
             margin: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 3px rgba(255, 255, 255, 0.2);
         }
 
         .btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+            background: linear-gradient(135deg, #660000 0%, #8b0000 100%);
         }
 
         .btn-secondary {
-            background: #6c757d;
+            background: linear-gradient(135deg, #404040 0%, #333333 100%);
+            border-color: #555;
         }
 
         .btn-secondary:hover {
-            background: #5a6268;
+            background: linear-gradient(135deg, #333333 0%, #404040 100%);
+            border-color: #666;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎉 Order Confirmed!</h1>
-            <p>Thank you for your purchase</p>
+            <h1>🤘 ROCK ON! Order Confirmed!</h1>
+            <p>You've got your brutal metal albums!</p>
         </div>
 
         <div class="success-card">
-            <div class="success-icon">✅</div>
-            <h1 class="success-title">Payment Successful!</h1>
+            <div class="success-icon">🔥</div>
+            <h1 class="success-title">PAYMENT SUCCESSFUL!</h1>
             <p class="success-message">
-                Your order has been processed successfully and will be shipped soon.
-                You will receive a confirmation email with tracking information.
+                🤘 Your brutal metal collection is on its way! 
+                <br>Your order has been processed and will be shipped to your lair soon.
+                <br>You'll receive a confirmation email with tracking info.
+                <br><strong>ROCK ON! 🤘</strong>
             </p>
             
             {% if order_details %}

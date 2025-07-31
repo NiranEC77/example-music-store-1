@@ -24,7 +24,7 @@ spec:
       labels:
         app: music-store-1
       annotations:
-        kubernetes.io/change-cause: "Updated styling - removed animations, brighter background"
+        kubernetes.io/change-cause: "Fixed cart session management, brighter theme, metal checkout styling"
     spec:
       containers:
       - name: music-store-1
