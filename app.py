@@ -78,7 +78,7 @@ INDEX_HTML = '''
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Music Store - Modern Collection</title>
+    <title>Metal Music Store - Brutal Collection</title>
     <style>
         * {
             margin: 0;
@@ -149,23 +149,18 @@ INDEX_HTML = '''
             font-weight: 900;
             margin-bottom: 10px;
             text-shadow: 
-                0 0 10px #ff0000,
-                0 0 20px #ff0000,
-                0 0 30px #ff0000,
+                0 0 5px #cc0000,
+                0 0 10px #cc0000,
                 2px 2px 4px rgba(0,0,0,0.8);
             color: #ffffff;
             text-transform: uppercase;
             letter-spacing: 3px;
-            background: linear-gradient(45deg, #ffffff, #cccccc, #ffffff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
         .header p {
             font-size: 1.4rem;
-            opacity: 0.8;
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            opacity: 0.9;
+            text-shadow: 0 0 5px rgba(204, 0, 0, 0.3);
             font-weight: 600;
         }
 
@@ -203,9 +198,9 @@ INDEX_HTML = '''
         }
 
         .tab.active {
-            background: linear-gradient(45deg, #ff0000, #cc0000);
+            background: linear-gradient(45deg, #cc0000, #990000);
             color: #ffffff;
-            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
             box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
         }
 
@@ -220,7 +215,7 @@ INDEX_HTML = '''
         .tab:hover {
             background: linear-gradient(45deg, #2d2d2d, #404040);
             color: #ffffff;
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            text-shadow: 0 0 5px rgba(204, 0, 0, 0.3);
         }
 
         .cart-tab {
@@ -243,7 +238,7 @@ INDEX_HTML = '''
         .cart-tab:hover {
             background: linear-gradient(45deg, #2d2d2d, #404040);
             color: #ffffff;
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            text-shadow: 0 0 5px rgba(204, 0, 0, 0.3);
         }
 
         .tab-content {
@@ -268,15 +263,14 @@ INDEX_HTML = '''
         }
 
         .section-title {
-            color: #ff0000;
+            color: #cc0000;
             margin-bottom: 25px;
             font-size: 2.5rem;
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 2px;
             text-shadow: 
-                0 0 10px #ff0000,
-                0 0 20px #ff0000,
+                0 0 5px #cc0000,
                 2px 2px 4px rgba(0,0,0,0.8);
             position: relative;
         }
@@ -321,8 +315,8 @@ INDEX_HTML = '''
             transform: translateY(-5px) scale(1.02);
             box-shadow: 
                 0 15px 35px rgba(0,0,0,0.8),
-                0 0 20px rgba(255, 0, 0, 0.3);
-            border-color: #ff0000;
+                0 0 15px rgba(204, 0, 0, 0.3);
+            border-color: #cc0000;
         }
 
         .album-card:hover::before {
@@ -348,7 +342,7 @@ INDEX_HTML = '''
             margin-bottom: 5px;
             font-size: 1.3rem;
             font-weight: 700;
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            text-shadow: 0 0 3px rgba(204, 0, 0, 0.3);
         }
 
         .album-info p {
@@ -361,9 +355,9 @@ INDEX_HTML = '''
         .album-price {
             font-size: 1.5rem;
             font-weight: 900;
-            color: #ff0000;
+            color: #cc0000;
             margin-bottom: 15px;
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            text-shadow: 0 0 5px rgba(204, 0, 0, 0.3);
         }
 
         .album-actions {
@@ -413,7 +407,7 @@ INDEX_HTML = '''
         }
 
         .btn {
-            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+            background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
             color: white;
             border: 2px solid #333;
             padding: 12px 24px;
@@ -424,15 +418,15 @@ INDEX_HTML = '''
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: all 0.3s ease;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
         }
 
         .btn:hover {
             transform: translateY(-3px) scale(1.05);
             box-shadow: 
                 0 10px 20px rgba(0,0,0,0.8),
-                0 0 20px rgba(255, 0, 0, 0.5);
-            background: linear-gradient(135deg, #cc0000 0%, #ff0000 100%);
+                0 0 15px rgba(204, 0, 0, 0.4);
+            background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
         }
 
         .stats-grid {
@@ -458,8 +452,8 @@ INDEX_HTML = '''
             font-size: 3rem;
             font-weight: 900;
             margin-bottom: 10px;
-            color: #ff0000;
-            text-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+            color: #cc0000;
+            text-shadow: 0 0 8px rgba(204, 0, 0, 0.5);
         }
 
         .stat-label {
@@ -487,14 +481,14 @@ INDEX_HTML = '''
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 8px;
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+            text-shadow: 0 0 3px rgba(204, 0, 0, 0.2);
         }
 
         /* Metal-themed animations */
         @keyframes metalGlow {
-            0% { box-shadow: 0 0 5px rgba(255, 0, 0, 0.3); }
-            50% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.6); }
-            100% { box-shadow: 0 0 5px rgba(255, 0, 0, 0.3); }
+            0% { box-shadow: 0 0 3px rgba(204, 0, 0, 0.2); }
+            50% { box-shadow: 0 0 10px rgba(204, 0, 0, 0.4); }
+            100% { box-shadow: 0 0 3px rgba(204, 0, 0, 0.2); }
         }
 
         @keyframes headbang {
@@ -572,8 +566,8 @@ INDEX_HTML = '''
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎵 Music Store</h1>
-            <p>Discover and collect your favorite albums</p>
+                            <h1>🤘 Metal Music Store</h1>
+                            <p>Discover and collect the most brutal metal albums</p>
         </div>
 
         <div class="tabs">

@@ -227,7 +227,7 @@ ORDERS_DASHBOARD_HTML = '''
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orders Dashboard - Music Store</title>
+    <title>Orders Dashboard - Metal Music Store</title>
     <style>
         * {
             margin: 0;
@@ -236,10 +236,29 @@ ORDERS_DASHBOARD_HTML = '''
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Orbitron', 'Arial Black', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 25%, #2d2d2d 50%, #1a1a1a 75%, #0a0a0a 100%);
             min-height: 100vh;
-            color: #333;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(204, 0, 0, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(204, 0, 0, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(204, 0, 0, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
         }
 
         .container {
@@ -251,22 +270,51 @@ ORDERS_DASHBOARD_HTML = '''
         .header {
             text-align: center;
             margin-bottom: 30px;
-            color: white;
+            color: #ffffff;
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .header::before {
+            content: '🤘';
+            font-size: 2rem;
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .header::after {
+            content: '🤘';
+            font-size: 2rem;
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
         }
 
         .header h1 {
-            font-size: 2.5rem;
-            font-weight: 300;
+            font-size: 3rem;
+            font-weight: 900;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 
+                0 0 5px #cc0000,
+                0 0 10px #cc0000,
+                2px 2px 4px rgba(0,0,0,0.8);
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
         }
 
         .dashboard-card {
-            background: white;
-            border-radius: 15px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            border-radius: 8px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 
+                0 10px 30px rgba(0,0,0,0.8),
+                inset 0 1px 0 rgba(255,255,255,0.1);
             backdrop-filter: blur(10px);
+            border: 2px solid #333;
         }
 
         .stats-grid {
@@ -277,22 +325,31 @@ ORDERS_DASHBOARD_HTML = '''
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            color: #ffffff;
             padding: 20px;
-            border-radius: 12px;
+            border-radius: 8px;
             text-align: center;
+            border: 2px solid #333;
+            box-shadow: 
+                0 5px 15px rgba(0,0,0,0.8),
+                inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
         .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
+            font-size: 2.5rem;
+            font-weight: 900;
             margin-bottom: 5px;
+            color: #cc0000;
+            text-shadow: 0 0 8px rgba(204, 0, 0, 0.5);
         }
 
         .stat-label {
-            font-size: 0.9rem;
+            font-size: 1rem;
             opacity: 0.9;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .orders-table {
@@ -305,17 +362,21 @@ ORDERS_DASHBOARD_HTML = '''
         .orders-table td {
             padding: 12px;
             text-align: left;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid #333;
+            color: #ffffff;
         }
 
         .orders-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #667eea;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            font-weight: 700;
+            color: #cc0000;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 5px rgba(204, 0, 0, 0.3);
         }
 
         .orders-table tr:hover {
-            background: #f8f9fa;
+            background: linear-gradient(135deg, #2d2d2d 0%, #404040 100%);
         }
 
         .status-badge {
@@ -382,6 +443,7 @@ ORDERS_DASHBOARD_HTML = '''
     <div class="container">
         <div class="header">
             <h1>📦 Orders Dashboard</h1>
+            <p>Track your brutal metal orders</p>
             <p>Manage all customer orders</p>
         </div>
 

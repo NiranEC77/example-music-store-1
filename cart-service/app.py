@@ -310,7 +310,7 @@ CART_HTML = '''
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopping Cart - Music Store</title>
+    <title>Shopping Cart - Metal Music Store</title>
     <style>
         * {
             margin: 0;
@@ -319,10 +319,29 @@ CART_HTML = '''
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Orbitron', 'Arial Black', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 25%, #2d2d2d 50%, #1a1a1a 75%, #0a0a0a 100%);
             min-height: 100vh;
-            color: #333;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(204, 0, 0, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(204, 0, 0, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(204, 0, 0, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
         }
 
         .container {
@@ -334,22 +353,51 @@ CART_HTML = '''
         .header {
             text-align: center;
             margin-bottom: 30px;
-            color: white;
+            color: #ffffff;
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .header::before {
+            content: '🤘';
+            font-size: 2rem;
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .header::after {
+            content: '🤘';
+            font-size: 2rem;
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
         }
 
         .header h1 {
-            font-size: 2.5rem;
-            font-weight: 300;
+            font-size: 3rem;
+            font-weight: 900;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 
+                0 0 5px #cc0000,
+                0 0 10px #cc0000,
+                2px 2px 4px rgba(0,0,0,0.8);
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
         }
 
         .cart-card {
-            background: white;
-            border-radius: 15px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            border-radius: 8px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 
+                0 10px 30px rgba(0,0,0,0.8),
+                inset 0 1px 0 rgba(255,255,255,0.1);
             backdrop-filter: blur(10px);
+            border: 2px solid #333;
         }
 
         .cart-item {
@@ -358,7 +406,8 @@ CART_HTML = '''
             gap: 20px;
             align-items: center;
             padding: 20px;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid #333;
+            transition: all 0.3s ease;
         }
 
         .cart-item:last-child {
@@ -374,18 +423,22 @@ CART_HTML = '''
         }
 
         .item-info h3 {
-            color: #333;
+            color: #ffffff;
             margin-bottom: 5px;
+            font-weight: 700;
+            text-shadow: 0 0 3px rgba(204, 0, 0, 0.3);
         }
 
         .item-info p {
-            color: #666;
+            color: #cccccc;
             font-size: 0.9rem;
+            font-weight: 600;
         }
 
         .item-price {
-            font-weight: bold;
-            color: #667eea;
+            font-weight: 900;
+            color: #cc0000;
+            text-shadow: 0 0 5px rgba(204, 0, 0, 0.3);
         }
 
         .quantity-controls {
@@ -396,49 +449,83 @@ CART_HTML = '''
 
         .quantity-controls input {
             width: 60px;
-            padding: 8px;
-            border: 2px solid #e9ecef;
+            padding: 10px;
+            border: 2px solid #333;
             border-radius: 6px;
             text-align: center;
+            background: #1a1a1a;
+            color: #ffffff;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .quantity-controls input:focus {
+            outline: none;
+            border-color: #cc0000;
+            box-shadow: 0 0 10px rgba(204, 0, 0, 0.5);
         }
 
         .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
             color: white;
-            border: none;
-            padding: 8px 16px;
+            border: 2px solid #333;
+            padding: 10px 20px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.9rem;
-            transition: transform 0.2s;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
         }
 
         .btn:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 
+                0 10px 20px rgba(0,0,0,0.8),
+                0 0 15px rgba(204, 0, 0, 0.4);
+            background: linear-gradient(135deg, #990000 0%, #cc0000 100%);
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            background: linear-gradient(135deg, #8b0000 0%, #660000 100%);
+            border-color: #660000;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #660000 0%, #8b0000 100%);
+            border-color: #cc0000;
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.8);
         }
 
         .cart-total {
-            background: #f8f9fa;
-            border-radius: 12px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            border-radius: 8px;
             padding: 25px;
             margin-top: 30px;
             text-align: right;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #cc0000;
+            border: 2px solid #333;
+            box-shadow: 
+                0 5px 15px rgba(0,0,0,0.8),
+                inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
         .cart-total h3 {
-            color: #667eea;
+            color: #cc0000;
             margin-bottom: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 5px rgba(204, 0, 0, 0.3);
         }
 
         .total-amount {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #667eea;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #cc0000;
+            text-shadow: 0 0 8px rgba(204, 0, 0, 0.5);
         }
 
         .cart-actions {
@@ -450,12 +537,13 @@ CART_HTML = '''
         .empty-cart {
             text-align: center;
             padding: 60px 20px;
-            color: #666;
+            color: #cccccc;
         }
 
         .empty-cart p {
             font-size: 1.1rem;
             margin-bottom: 20px;
+            font-weight: 600;
         }
 
         @media (max-width: 768px) {
@@ -475,7 +563,7 @@ CART_HTML = '''
     <div class="container">
         <div class="header">
             <h1>🛒 Shopping Cart</h1>
-            <p>Review your items</p>
+            <p>Review your brutal metal collection</p>
         </div>
 
         <div class="cart-card">
