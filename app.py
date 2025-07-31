@@ -88,7 +88,7 @@ INDEX_HTML = '''
 
         body {
             font-family: 'Orbitron', 'Arial Black', sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 25%, #404040 50%, #2d2d2d 75%, #1a1a1a 100%);
+            background: linear-gradient(135deg, #2d2d2d 0%, #404040 25%, #555555 50%, #404040 75%, #2d2d2d 100%);
             min-height: 100vh;
             color: #ffffff;
             margin: 0;
@@ -295,7 +295,6 @@ INDEX_HTML = '''
             border-radius: 8px;
             padding: 20px;
             border: 2px solid #333;
-            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
             display: flex;
@@ -315,11 +314,7 @@ INDEX_HTML = '''
         }
 
         .album-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 
-                0 15px 35px rgba(0,0,0,0.8),
-                0 0 15px rgba(204, 0, 0, 0.3);
-            border-color: #cc0000;
+            border-color: #8b0000;
         }
 
         .album-card:hover::before {
@@ -510,9 +505,7 @@ INDEX_HTML = '''
             animation: metalGlow 3s ease-in-out infinite;
         }
 
-        .album-card:hover {
-            animation: headbang 0.5s ease-in-out;
-        }
+
             margin-bottom: 8px;
             font-weight: 500;
             color: #555;

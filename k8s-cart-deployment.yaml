@@ -38,6 +38,8 @@ spec:
     metadata:
       labels:
         app: cart-service
+      annotations:
+        kubernetes.io/change-cause: "Updated styling - brighter background"
     spec:
       containers:
       - name: cart-service

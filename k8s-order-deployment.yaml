@@ -38,6 +38,8 @@ spec:
     metadata:
       labels:
         app: order-service
+      annotations:
+        kubernetes.io/change-cause: "Updated styling - brighter background"
     spec:
       containers:
       - name: order-service

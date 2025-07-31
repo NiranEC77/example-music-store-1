@@ -23,6 +23,8 @@ spec:
     metadata:
       labels:
         app: music-store-1
+      annotations:
+        kubernetes.io/change-cause: "Updated styling - removed animations, brighter background"
     spec:
       containers:
       - name: music-store-1

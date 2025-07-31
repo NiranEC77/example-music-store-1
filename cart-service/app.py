@@ -320,7 +320,7 @@ CART_HTML = '''
 
         body {
             font-family: 'Orbitron', 'Arial Black', sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 25%, #404040 50%, #2d2d2d 75%, #1a1a1a 100%);
+            background: linear-gradient(135deg, #2d2d2d 0%, #404040 25%, #555555 50%, #404040 75%, #2d2d2d 100%);
             min-height: 100vh;
             color: #ffffff;
             margin: 0;
