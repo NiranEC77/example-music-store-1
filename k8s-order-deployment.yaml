@@ -43,7 +43,7 @@ spec:
     spec:
       containers:
       - name: order-service
-        image: ghcr.io/niranec77/example-music-store-1-order:1.0.37
+        image: ghcr.io/niranec77/example-music-store-1-order:1.0.38
         imagePullPolicy: Always
         ports:
         - containerPort: 5001
