@@ -602,9 +602,6 @@ INDEX_HTML = '''
                                         <input type="number" name="quantity" value="1" min="1" placeholder="Qty">
                                         <button type="submit" class="btn">Add to Cart</button>
                                     </form>
-                                    <form action="/delete/{{a.id}}" method="post" class="delete-form" onsubmit="return confirm('Are you sure you want to delete this album?')">
-                                        <button type="submit" class="btn btn-danger">Delete</button>
-                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -682,6 +679,29 @@ INDEX_HTML = '''
                         </div>
                         {% endif %}
                     </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <h3 style="color: #667eea; margin-bottom: 20px;">🗑️ Manage Albums</h3>
+                    {% if albums %}
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+                        {% for a in albums %}
+                        <div style="background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%); border: 2px solid #333; border-radius: 8px; padding: 20px;">
+                            <h4 style="color: #ffffff; margin-bottom: 10px;">{{a.name}}</h4>
+                            <p style="color: #cccccc; margin-bottom: 15px;">by {{a.artist}}</p>
+                            <p style="color: #8b0000; font-weight: bold; margin-bottom: 15px;">${{"%.2f"|format(a.price)}}</p>
+                            <form action="/delete/{{a.id}}" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete {{a.name}}?')">
+                                <button type="submit" class="btn btn-danger" style="width: 100%;">Delete Album</button>
+                            </form>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <p>No albums to manage.</p>
+                    </div>
+                    {% endif %}
+                </div>
                 </div>
             </div>
         </div>
@@ -873,7 +893,16 @@ def process_payment():
     import requests
     
     try:
-        response = requests.post(f"{CART_SERVICE_URL}/process_payment", data=request.form)
+        # Get session_id from our session
+        session_id = session.get('cart_session_id')
+        if not session_id:
+            return redirect(url_for('view_cart'))
+        
+        # Add session_id to the form data
+        form_data = request.form.copy()
+        form_data['session_id'] = session_id
+        
+        response = requests.post(f"{CART_SERVICE_URL}/process_payment", data=form_data)
         return response.content, response.status_code
     except requests.RequestException as e:
         return f"Error connecting to cart service: {str(e)}", 503

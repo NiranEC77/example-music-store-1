@@ -39,7 +39,7 @@ spec:
       labels:
         app: cart-service
       annotations:
-        kubernetes.io/change-cause: "Fixed cart session management, metal checkout theme, cool success message"
+        kubernetes.io/change-cause: "Fixed session_id KeyError in remove_item and update_quantity routes"
     spec:
       containers:
       - name: cart-service

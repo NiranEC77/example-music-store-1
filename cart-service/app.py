@@ -130,6 +130,16 @@ def add_to_cart():
 
 @app.route('/update_quantity', methods=['POST'])
 def update_quantity():
+    # Get session_id from request or session
+    session_id = request.form.get('session_id')
+    if not session_id:
+        if 'session_id' not in session:
+            return redirect(url_for('cart'))
+        session_id = session['session_id']
+    else:
+        # Use the provided session_id and store it in our session
+        session['session_id'] = session_id
+    
     item_id = int(request.form['item_id'])
     quantity = int(request.form['quantity'])
     
@@ -138,26 +148,36 @@ def update_quantity():
         with sqlite3.connect(CART_DB_PATH) as conn:
             c = conn.cursor()
             c.execute('DELETE FROM cart_items WHERE id = ? AND session_id = ?', 
-                     (item_id, session['session_id']))
+                     (item_id, session_id))
             conn.commit()
     else:
         # Update quantity
         with sqlite3.connect(CART_DB_PATH) as conn:
             c = conn.cursor()
             c.execute('UPDATE cart_items SET quantity = ? WHERE id = ? AND session_id = ?', 
-                     (quantity, item_id, session['session_id']))
+                     (quantity, item_id, session_id))
             conn.commit()
     
     return redirect(url_for('cart'))
 
 @app.route('/remove_item', methods=['POST'])
 def remove_item():
+    # Get session_id from request or session
+    session_id = request.form.get('session_id')
+    if not session_id:
+        if 'session_id' not in session:
+            return redirect(url_for('cart'))
+        session_id = session['session_id']
+    else:
+        # Use the provided session_id and store it in our session
+        session['session_id'] = session_id
+    
     item_id = int(request.form['item_id'])
     
     with sqlite3.connect(CART_DB_PATH) as conn:
         c = conn.cursor()
         c.execute('DELETE FROM cart_items WHERE id = ? AND session_id = ?', 
-                 (item_id, session['session_id']))
+                 (item_id, session_id))
         conn.commit()
     
     return redirect(url_for('cart'))
