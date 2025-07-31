@@ -1003,7 +1003,18 @@ def process_payment():
         form_data = request.form.copy()
         form_data['session_id'] = session_id
         
-        response = requests.post(f"{CART_SERVICE_URL}/process_payment", data=form_data)
+        response = requests.post(f"{CART_SERVICE_URL}/process_payment", data=form_data, allow_redirects=False)
+        
+        # Handle redirects from cart service
+        if response.status_code in [301, 302, 303, 307, 308]:
+            redirect_url = response.headers.get('Location', '')
+            if redirect_url.startswith('/'):
+                # If it's a relative URL, redirect to our order_success route
+                return redirect(url_for('order_success'))
+            else:
+                # If it's an absolute URL, redirect to it
+                return redirect(redirect_url)
+        
         return response.content, response.status_code
     except requests.RequestException as e:
         return f"Error connecting to cart service: {str(e)}", 503
