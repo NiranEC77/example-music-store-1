@@ -21,12 +21,12 @@ spec:
         - containerPort: 5003
         env:
         - name: USERS_DB_PATH
-          value: "/app/users.db"
+          value: "/app/data/users.db"
         - name: FLASK_ENV
           value: "production"
         volumeMounts:
         - name: users-data
-          mountPath: /app
+          mountPath: /app/data
         resources:
           requests:
             memory: "128Mi"
