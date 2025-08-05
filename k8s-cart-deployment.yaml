@@ -43,10 +43,27 @@ spec:
         date: "2024-01-$(date +%d)"
         timestamp: "$(date +%s)"
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: cart-service
         image: ghcr.io/niranec77/example-music-store-1-cart:1.0.47
         imagePullPolicy: Always
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          seccompProfile:
+            type: RuntimeDefault
         ports:
         - containerPort: 5002
         env:
