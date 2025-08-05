@@ -23,7 +23,7 @@ spec:
           type: RuntimeDefault
       containers:
       - name: users-service
-        image: ghcr.io/niranec77/example-music-store-1-users:1.0.47
+        image: ghcr.io/niranec77/example-music-store-1-users:1.0.48
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
