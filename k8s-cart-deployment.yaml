@@ -52,7 +52,7 @@ spec:
           type: RuntimeDefault
       containers:
       - name: cart-service
-        image: ghcr.io/niranec77/example-music-store-1-cart:1.0.48
+        image: ghcr.io/niranec77/example-music-store-1-cart:1.0.49
         imagePullPolicy: Always
         securityContext:
           allowPrivilegeEscalation: false
