@@ -88,7 +88,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: users-pvc
 spec:
-  storageClassName: vsan-default-storage-policy
+  storageClassName: vcfa-storage-policy
   accessModes:
     - ReadWriteOnce
   resources:
