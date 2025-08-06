@@ -3,7 +3,6 @@ kind: PersistentVolumeClaim
 metadata:
   name: cart-pvc
 spec:
-  storageClassName: vcfa-storage-policy
   accessModes:
     - ReadWriteOnce
   resources:

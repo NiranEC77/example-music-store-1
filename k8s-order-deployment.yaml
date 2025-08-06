@@ -3,7 +3,6 @@ kind: PersistentVolumeClaim
 metadata:
   name: order-pvc
 spec:
-  storageClassName: vcfa-storage-policy
   accessModes:
     - ReadWriteOnce
   resources:
